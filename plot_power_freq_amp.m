@@ -11,7 +11,7 @@ yax = f_n.*t_o;
 figure(1)
 colormap(cool)
 
-subplot(1,3,1)
+subplot(1,2,2)
 surf(synch_gain_range,yax(1:end),conv_array(:,:),'edgecolor', 'none')
 axis square
 axis([min(synch_gain_range) max(synch_gain_range) min(yax) max(yax)])
@@ -20,23 +20,23 @@ xlabel('K_r')
 ylabel('t_o/T_n')
 a = colorbar;
 a.Label.String = 'power (au)';
-a.Label.FontSize = 8;
+a.Label.FontSize = 12;
 %set(gca,'ColorScale','log')
 set(gca,'YScale','log')
 
 
-subplot(1,3,2)
+subplot(1,2,1)
 surf(synch_gain_range(1:end),yax(1:end),freq_array(1:end,1:end), 'edgecolor', 'none')
 axis square
 axis([min(synch_gain_range) max(synch_gain_range) min(yax) max(yax)])
 view(0,90)
 xlabel('K_r')
-ylabel('f_n t_o')
+ylabel('t_o/T_n')
 a = colorbar;
 a.Label.String = 'f/f_s_y_n_c_h';
-a.Label.FontSize = 8;
+a.Label.FontSize = 12;
 set(gca,'YScale','log')
-
+%{
 subplot(1,3,3)
 surf(synch_gain_range,yax,est_amp_array(:,:), 'edgecolor', 'none')
 axis square
@@ -51,7 +51,7 @@ a.Label.FontSize = 8;
 %set(gca,'ColorScale','log')
 %set(gca,'XScale','log')
 set(gca,'YScale','log')
-
+%}
 
 set(gcf, 'RendererMode', 'manual');
 set(gcf, 'Renderer','painters');

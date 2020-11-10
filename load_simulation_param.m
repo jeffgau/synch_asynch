@@ -10,7 +10,7 @@ if strcmp(system, 'moth')
     sampling_f = 10000;
     t = linspace(0, t_end, t_end * sampling_f); % Simulation frequency: 1 kHz
     r3_range = calculate_r3_range(ntests, f_n, r4_ratio);
-    r3_spect = r3_range(5);
+    r3_spect = r3_range(7);
 
 elseif strcmp(system,'robobee')
     ntests  = 10;

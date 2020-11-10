@@ -1,5 +1,5 @@
 clear
-system = 'flapper'; %flapper or robobee
+system = 'moth'; % moth flapper or robobee
 tic % Typically ~0.5-1s per moth simulation
 
 sys_param = load_system_param(system);
