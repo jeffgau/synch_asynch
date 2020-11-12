@@ -1,3 +1,5 @@
 
 *.mat
 *.pdf
+data/20201111_flapper/synch_asynch_data/data_handling.m
+data/20201111_flapper/synch_asynch_data/calculate_r3_range.m
