@@ -41,10 +41,7 @@ lc_keys = {'limit_pos', 'limit_vel', 'limit_t', 'spectrogram_r3', 'synch_gain_ra
 lc_vals = {limit_pos, limit_vel, t, spectrogram_r3, synch_gain_range, freq_array};
 lc_data = containers.Map(lc_keys, lc_vals);
 
-
-plot_limit_cycles(lc_data);
+%plot_limit_cycles(lc_data);
 save_limit_cycle_data(lc_data);
-
-save_ofp_data(ofp_data);
-save_limit_cycle_data(lc_data)
+%save_ofp_data(ofp_data);
 toc

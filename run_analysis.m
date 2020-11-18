@@ -19,6 +19,7 @@ plot_spectrogram(spect_data);
 plot_force_mag(force_data);
 plot_kernels(sim_param);
 plot_limit_cycles(lc_data);
+plot_r3_freq(freq_array, sim_param('r3_range'))
 
 save_ofp_data(ofp_data);
 save_limit_cycle_data(lc_data)

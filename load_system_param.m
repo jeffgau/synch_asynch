@@ -19,8 +19,7 @@ if strcmp(system, 'moth')
     K = K/T^2;
     
     % Synchronous forcing
-    
-    gain_constant = 2000/T;
+    gain_constant = 1790/T;
     asynch_gain = 1/75000;
     synch_freq = 25;
     

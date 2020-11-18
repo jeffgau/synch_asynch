@@ -79,6 +79,8 @@ for p = 1:ntests
         downstroke      = dat(:,1);
         net_force       = upstroke + downstroke;
         
+        plot(t, position(1:end-1))
+        hold on
         upstroke_passive    = dat(:,5);
         upstroke_asynch     = dat(:,6);
         downstroke_passive 	= dat(:,7);
@@ -105,7 +107,7 @@ for p = 1:ntests
             limit_pos = [limit_pos, position];
             limit_vel = [limit_vel, velocity];
             figure(1)
-            plot(position, velocity)
+            %plot(position, velocity)
         end
         
         % Calculate empirical power requirements

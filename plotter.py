@@ -171,12 +171,12 @@ plt.show()
 """
 plot limit cycle data
 """
-synch_gain_range = loadmat('/data/limit_cycle/synch_gain_range.mat')['synch_gain_range'][0].flatten()
+synch_gain_range = loadmat('data/limit_cycle/synch_gain_range.mat')['synch_gain_range'][0].flatten()
 
-t = loadmat('../data/limit_cycle/t.mat')['t'][0].flatten()
-r3 = loadmat('../data/limit_cycle/r3.mat')['r3'][0].flatten()
-pos = loadmat('../data/limit_cycle/pos.mat')['pos']
-vel = loadmat('../data/limit_cycle/vel.mat')['vel']
+t = loadmat('data/limit_cycle/t.mat')['t'][0].flatten()
+r3 = loadmat('data/limit_cycle/r3.mat')['r3'][0].flatten()
+pos = loadmat('data/limit_cycle/pos.mat')['pos']
+vel = loadmat('data/limit_cycle/vel.mat')['vel']
 
 pos = pos[:len(t),:]
 vel = vel[:len(t),:]
@@ -201,7 +201,7 @@ for i in range(len(synch_gain_range)):
     vel_plot = vel_plot/np.max(vel[:,-1])
     
     ax[i].axis([-1.5, 1.5, -1.5, 1.5])
-    ax[i].plot(pos_plot, vel_plot, linewidth = 1, color = colors[i])
+    ax[i].plot(pos_plot, vel_plot, linewidth = 1, color = colors[i], alpha = 1)
     ax[i].set_yticks([])
     ax[i].set_xticks([])
     ax[i].set_aspect('equal', adjustable='box')
@@ -223,7 +223,10 @@ plt.savefig('figures/kr_range.png', format = 'png', dpi = 500)
 plt.show()
 
 
-
+"""
+plot r3 vs freq
+"""
+print('to do')
 
 
 
