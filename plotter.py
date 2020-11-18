@@ -146,11 +146,11 @@ for r3 in r3_range:
 plot power freq amp from MATLAB simulation
 """
 from scipy.io import loadmat
-synch_gain_range = loadmat('../data/synch_gain_range.mat')['synch_gain_range'][0].flatten()
-yax = loadmat('../data/yax.mat')['yax'][0].flatten()
-power = loadmat('../data/power.mat')['power']
-freq = loadmat('../data/freq.mat')['freq']
-osc_amp = loadmat('../data/osc_amp.mat')['osc_amp']
+synch_gain_range = loadmat('data/synch_gain_range.mat')['synch_gain_range'][0].flatten()
+yax = loadmat('data/yax.mat')['yax'][0].flatten()
+power = loadmat('data/power.mat')['power']
+freq = loadmat('data/freq.mat')['freq']
+osc_amp = loadmat('data/osc_amp.mat')['osc_amp']
 
 power_df = pd.DataFrame(data = power, columns = synch_gain_range, index = yax)
 power_df = power_df.rename_axis('yax')
@@ -224,7 +224,7 @@ plt.show()
 
 
 """
-plot r3 vs freq
+plot robobee limit cycle
 """
 print('to do')
 
