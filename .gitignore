@@ -6,3 +6,5 @@ data/20201111_flapper/synch_asynch_data/data_handling.m
 *.png
 *.png
 *.fig
+*.svg
+*.asv
