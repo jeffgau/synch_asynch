@@ -1,4 +1,4 @@
-function [force_array, conv_array, freq_array, est_amp_array, spect_data, force_data, ofp_data, lc_data, psd_array] = run_simulation(sys_param, sim_param)
+function [force_array, conv_array, freq_array, est_amp_array, spect_data, force_data, ofp_data, lc_data] = run_simulation(sys_param, sim_param)
 
 % Unpack system parameters
 Inertia = sys_param('I');
@@ -27,8 +27,8 @@ r4_ratio = sim_param('r4_ratio');
 freq_array      = zeros(ntests,ntests);
 conv_array      = zeros(ntests,ntests);
 est_amp_array   = zeros(ntests,ntests);
-force_array     = zeros(ntests,ntests);
-psd_array       = zeros(ntests, ntests);
+force_array = zeros(ntests,ntests);
+psd_array       
 
 
 
@@ -113,7 +113,7 @@ for p = 1:ntests
         conv_array(p,k) = calculate_power(velocity, net_force, position, t);
         
         % Calculate power ratio in dominant frequency
-        psd = peaks.^2;
+        psd = peaks^2;
         total_power = sum(psd);
         psd_ratio = peaks(peak_idx)^2/total_power;
         

@@ -223,13 +223,6 @@ plt.savefig('figures/kr_range.png', format = 'png', dpi = 500)
 plt.show()
 
 
-"""
-plot robobee limit cycle
-"""
-print('to do')
-
-
-
 
 
 

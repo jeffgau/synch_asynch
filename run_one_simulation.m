@@ -22,10 +22,10 @@ sampling_f = sim_param('sampling_f');
 synch_gain_range = sim_param('synch_gain_range');
 t = sim_param('t');
 t_end = sim_param('t_end');
+r4_ratio = sim_param('r4_ratio');
 
 
 max_force = [];
-r4_ratio = 0.1;
 
 for i = 1:length(r3_range)
     

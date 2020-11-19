@@ -1,7 +1,7 @@
 function plot_r3_freq(freq_array, r3_range)
 k3 = 1; 
 k4 = 1;
-t_o = log( (k3*r3_range)/(k4*r3_range*0.1) )./(r3_range-r3_range*0.1); % Time to peak
+t_o = log( (k3*r3_range)/(k4*r3_range*r4_ratio) )./(r3_range-r3_range*r4_ratio); % Time to peak
 
 yax = f_n.*t_o;
 
