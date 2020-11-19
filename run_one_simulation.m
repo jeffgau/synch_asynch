@@ -22,10 +22,10 @@ sampling_f = sim_param('sampling_f');
 synch_gain_range = sim_param('synch_gain_range');
 t = sim_param('t');
 t_end = sim_param('t_end');
+r4_ratio = sim_param('r4_ratio');
 
 
 max_force = [];
-r4_ratio = 0.1;
 
 for i = 1:length(r3_range)
     
@@ -67,7 +67,8 @@ for i = 1:length(r3_range)
     upstroke_synch      = dat(:,9);
     downstroke_synch    = dat(:,10);
     plot(position)
-    
+    power = calculate_power(velocity, net_force, position, t);
+
     %spring_force        = dat(:,11);
     %aero_force          = dat(:,12);
     %visc_force          = dat(:,13);
@@ -78,7 +79,8 @@ for i = 1:length(r3_range)
     osc_freq = freq(peak_idx)/synch_freq;
     osc_amp = peaks(peak_idx);
     
-    max_force = [max_force, max(osc_amp)]; %THIS IS THE OPTIMIZED PARAMETR!
+    half_idx = length(position)/2;
+    max_force = [max_force, osc_amp]; %THIS IS THE OPTIMIZED PARAMETR! position, osc amp, power. Not peak force
 end
 peak_force = max(max_force);
 end

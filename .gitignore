@@ -1,10 +1,11 @@
 
 *.mat
 *.pdf
-data/20201111_flapper/synch_asynch_data/calculate_r3_range.m
+
 data/20201111_flapper/synch_asynch_data/data_handling.m
+data/20201111_flapper/synch_asynch_data/calculate_r3_range.m
+data/20201111_flapper/~$notes.docx
 *.png
-*.png
-*.fig
 *.svg
+data/20201118_robobee/limit_cycle_prelim.fig
 *.asv

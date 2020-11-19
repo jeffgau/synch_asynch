@@ -1,4 +1,4 @@
-function [force_array, conv_array, freq_array, est_amp_array, spect_data, force_data, ofp_data, lc_data] = run_simulation(sys_param, sim_param)
+function [force_array, conv_array, freq_array, est_amp_array, spect_data, force_data, ofp_data, lc_data, psd_array] = run_simulation(sys_param, sim_param)
 
 % Unpack system parameters
 Inertia = sys_param('I');
@@ -22,12 +22,14 @@ sampling_f = sim_param('sampling_f');
 synch_gain_range = sim_param('synch_gain_range');
 t = sim_param('t');
 t_end = sim_param('t_end');
-
+r4_ratio = sim_param('r4_ratio');
 
 freq_array      = zeros(ntests,ntests);
 conv_array      = zeros(ntests,ntests);
 est_amp_array   = zeros(ntests,ntests);
-force_array = zeros(ntests,ntests);
+force_array     = zeros(ntests,ntests);
+psd_array       = zeros(ntests, ntests, 2, length(t) + 1);
+lc_array        = zeros(ntests, ntests, 2, length(t) + 1);
 
 
 
@@ -40,8 +42,6 @@ n_freqs = 2000; % Number of fourier modes to plot
 limit_pos = [];
 limit_vel = [];
 limit_t = [];
-
-r4_ratio = 0.1;
 
 
 for p = 1:ntests
@@ -79,6 +79,8 @@ for p = 1:ntests
         downstroke      = dat(:,1);
         net_force       = upstroke + downstroke;
         
+        plot(t, position(1:end-1))
+        hold on
         upstroke_passive    = dat(:,5);
         upstroke_asynch     = dat(:,6);
         downstroke_passive 	= dat(:,7);
@@ -92,7 +94,7 @@ for p = 1:ntests
         %visc_force          = dat(:,13);
         
         % Extract properties of dominant oscillation frequency
-        [freq, peaks] = fourier_analysis(position - mean(position), sampling_f);
+        [freq, peaks] = fourier_analysis(position(length(t)/2:end) - mean(position(length(t)/2:end)), sampling_f);
         peak_idx = find(peaks == max(peaks));
         osc_freq = freq(peak_idx)/synch_freq;
         osc_amp = peaks(peak_idx);
@@ -105,11 +107,20 @@ for p = 1:ntests
             limit_pos = [limit_pos, position];
             limit_vel = [limit_vel, velocity];
             figure(1)
-            plot(position, velocity)
+            %plot(position, velocity)
         end
+        lc_array(p,k,1,:) = position;
+        lc_array(p,k,2,:) = velocity;
         
         % Calculate empirical power requirements
         conv_array(p,k) = calculate_power(velocity, net_force, position, t);
+        
+        % Calculate power ratio in dominant frequency
+        psd = peaks.^2;
+        total_power = sum(psd);
+        psd_ratio = peaks(peak_idx)^2/total_power;
+        
+        psd_array(p,k) = psd_ratio;
         
         % Keep track of peak force
         force_array(p,k) = max(net_force);
@@ -139,8 +150,8 @@ ofp_keys = {'synch_gain_range', 'yax', 'conv_array', 'freq_array', 'est_amp_arra
 ofp_vals = {synch_gain_range, yax, conv_array, freq_array, est_amp_array};
 ofp_data = containers.Map(ofp_keys, ofp_vals);
 
-lc_keys = {'limit_pos', 'limit_vel', 'limit_t', 'spectrogram_r3', 'synch_gain_range', 'freq_array'};
-lc_vals = {limit_pos, limit_vel, t, spectrogram_r3, synch_gain_range, freq_array};
+lc_keys = {'limit_pos', 'limit_vel', 'limit_t', 'spectrogram_r3', 'synch_gain_range', 'freq_array', 'lc_array'};
+lc_vals = {limit_pos, limit_vel, t, spectrogram_r3, synch_gain_range, freq_array, lc_array};
 lc_data = containers.Map(lc_keys, lc_vals);
     
 
