@@ -6,7 +6,7 @@ r4_ratio = 0.62;
 if strcmp(system, 'moth')
     ntests  = 10;
     synch_gain_range = linspace(0, 1, ntests);
-    t_end       = 5;
+    t_end       = 10;
     sampling_f = 10000;
     t = linspace(0, t_end, t_end * sampling_f); % Simulation frequency: 1 kHz
     r3_range = calculate_r3_range(ntests, f_n, r4_ratio);

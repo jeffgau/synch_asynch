@@ -28,7 +28,8 @@ freq_array      = zeros(ntests,ntests);
 conv_array      = zeros(ntests,ntests);
 est_amp_array   = zeros(ntests,ntests);
 force_array     = zeros(ntests,ntests);
-psd_array       = zeros(ntests, ntests);
+psd_array       = zeros(ntests, ntests, 2, length(t) + 1);
+lc_array        = zeros(ntests, ntests, 2, length(t) + 1);
 
 
 
@@ -93,7 +94,7 @@ for p = 1:ntests
         %visc_force          = dat(:,13);
         
         % Extract properties of dominant oscillation frequency
-        [freq, peaks] = fourier_analysis(position - mean(position), sampling_f);
+        [freq, peaks] = fourier_analysis(position(length(t)/2:end) - mean(position(length(t)/2:end)), sampling_f);
         peak_idx = find(peaks == max(peaks));
         osc_freq = freq(peak_idx)/synch_freq;
         osc_amp = peaks(peak_idx);
@@ -108,6 +109,8 @@ for p = 1:ntests
             figure(1)
             %plot(position, velocity)
         end
+        lc_array(p,k,1,:) = position;
+        lc_array(p,k,2,:) = velocity;
         
         % Calculate empirical power requirements
         conv_array(p,k) = calculate_power(velocity, net_force, position, t);
@@ -147,8 +150,8 @@ ofp_keys = {'synch_gain_range', 'yax', 'conv_array', 'freq_array', 'est_amp_arra
 ofp_vals = {synch_gain_range, yax, conv_array, freq_array, est_amp_array};
 ofp_data = containers.Map(ofp_keys, ofp_vals);
 
-lc_keys = {'limit_pos', 'limit_vel', 'limit_t', 'spectrogram_r3', 'synch_gain_range', 'freq_array'};
-lc_vals = {limit_pos, limit_vel, t, spectrogram_r3, synch_gain_range, freq_array};
+lc_keys = {'limit_pos', 'limit_vel', 'limit_t', 'spectrogram_r3', 'synch_gain_range', 'freq_array', 'lc_array'};
+lc_vals = {limit_pos, limit_vel, t, spectrogram_r3, synch_gain_range, freq_array, lc_array};
 lc_data = containers.Map(lc_keys, lc_vals);
     
 

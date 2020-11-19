@@ -21,7 +21,7 @@ xlabel('K_r')
 ylabel('t_o/T_n')
 a = colorbar;
 a.Label.String = 'power (au)';
-a.Label.FontSize = 12;
+a.Label.FontSize = 14;
 %set(gca,'ColorScale','log')
 set(gca,'YScale','log')
 
@@ -35,7 +35,7 @@ xlabel('K_r')
 ylabel('t_o/T_n')
 a = colorbar;
 a.Label.String = 'f/f_s_y_n_c_h';
-a.Label.FontSize = 12;
+a.Label.FontSize = 14;
 set(gca,'YScale','log')
 %{
 subplot(1,3,3)
@@ -63,8 +63,8 @@ view(0,90)
 xlabel('K_r')
 ylabel('t_o/T_n')
 a = colorbar;
-a.Label.String = 'energy ratio)';
-a.Label.FontSize = 12;
+a.Label.String = 'energy ratio';
+a.Label.FontSize = 14;
 %set(gca,'ColorScale','log')
 set(gca,'YScale','log')
 
