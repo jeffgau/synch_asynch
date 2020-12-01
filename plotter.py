@@ -203,7 +203,7 @@ fig, ax = plt.subplots(2, 1, figsize = (3,5))
 sns.set(font_scale = 1, style = 'ticks')
 #pos = ax[0].imshow(power_df[::-1], cmap = 'Reds', extent = [np.min(synch_gain_range), np.max(synch_gain_range),0.01, 1])
 
-pos = ax[1].pcolor(X, Y, power_df, cmap = 'Reds', edgecolors = 'none', linewidth = 0)
+pos = ax[1].pcolor(X, Y, power_df, cmap = 'Reds', edgecolors = 'face', linewidth = .1)
 ax[1].set_yscale('log')
 cbar = fig.colorbar(pos, ax = ax[1])#,fraction=0.046, pad=0.04) 
 cbar.ax.set_ylabel('power (au)')
@@ -212,7 +212,7 @@ ax[1].axis('equal')
 freqcmap = colors.LinearSegmentedColormap.from_list('freqcmap', ['#FFFFFF', '#B2CCFB','#FF3032'])
 #fig, ax = plt.subplots(1, 1, figsize = (3,3))
 sns.set(font_scale = 1, style = 'ticks')
-pos = ax[0].pcolor(X,Y, freq, cmap = freqcmap, norm=MidpointNormalize(midpoint=1,vmin=0, vmax=4), vmin = 0, vmax = 4, edgecolors = None, linewidth = 0)
+pos = ax[0].pcolor(X,Y, freq, cmap = freqcmap, norm=MidpointNormalize(midpoint=1,vmin=0, vmax=3), vmin = 0, vmax = 3, edgecolors = 'face', linewidth = .1)
 #ax.set_ysclale('log')
 cbar = fig.colorbar(pos, ax = ax[0])#,fraction=0.046, pad=0.04) 
 cbar.ax.set_ylabel(r'$f/f_s$')
@@ -239,10 +239,17 @@ fig, ax = plt.subplots(1, 1, figsize = (6.3,5))
 sns.set(font_scale = 1, style = 'ticks')
 #pos = ax[0].imshow(power_df[::-1], cmap = 'Reds', extent = [np.min(synch_gain_range), np.max(synch_gain_range),0.01, 1])
 
-freqcmap = colors.LinearSegmentedColormap.from_list('freqcmap', ['#FFFFFF', '#B2CCFB','#FF3032'])
+#freqcmap = colors.LinearSegmentedColormap.from_list('', ['#E0DB26', '#B2CCFB','#FF3032'])
+freqcmap = colors.LinearSegmentedColormap.from_list('freqcmap', ['white', 'red'])
+freqcmap.set_bad('#B2CCFB')
+
+
+test_freq = np.ma.masked_values(freq, 1, rtol = 1E-3, copy = True)
 #fig, ax = plt.subplots(1, 1, figsize = (3,3))
 sns.set(font_scale = 1, style = 'ticks')
-pos = ax.pcolor(X,Y, freq, cmap = freqcmap, norm=MidpointNormalize(midpoint=1,vmin=0, vmax=4), vmin = 0, vmax = 4, antialiased = True,edgecolor = 'face', linewidth = 1)
+#pos = ax.pcolormesh(X,Y, test_freq, cmap = cmap, norm=MidpointNormalize(midpoint=1,vmin=0, vmax=3), vmin = 0, vmax = 3, edgecolor = 'face', linewidth = 1)
+pos = ax.pcolormesh(X,Y, test_freq, cmap = freqcmap, vmin = 0, vmax = 3, edgecolor = 'face', linewidth = 1)
+
 #ax.set_ysclale('log')
 cbar = fig.colorbar(pos, ax = ax)#,fraction=0.046, pad=0.04) 
 cbar.ax.set_ylabel(r'$f/f_s$')
@@ -352,6 +359,13 @@ plt.show()
 
 #%%
 lc_array = loadmat('data/limit_cycle/lc_array.mat')['lc_array']
+
+"""
+https://stackoverflow.com/questions/17316880/reading-v-7-3-mat-file-in-python
+import hdf5storage
+mat = hdf5storage.loadmat('test.mat')
+"""
+
 
 slice_idx = 5;
 lc_array = lc_array[::2,::2, :, :]

@@ -17,7 +17,7 @@ save('data/limit_cycle/r3', 'r3')
 save('data/limit_cycle/synch_gain_range', 'synch_gain_range')
 save('data/limit_cycle/freqs', 'freqs')
 
-save('data/limit_cycle/lc_array', 'lc_array')
+save('data/limit_cycle/lc_array', 'lc_array', '-v7.3')
 
 end
 
