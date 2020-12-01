@@ -28,7 +28,7 @@ freq_array      = zeros(ntests,ntests);
 conv_array      = zeros(ntests,ntests);
 est_amp_array   = zeros(ntests,ntests);
 force_array     = zeros(ntests,ntests);
-psd_array       = zeros(ntests, ntests, 2, length(t) + 1);
+psd_array       = zeros(ntests, ntests);
 lc_array        = zeros(ntests, ntests, 2, length(t) + 1);
 
 
@@ -116,11 +116,14 @@ for p = 1:ntests
         conv_array(p,k) = calculate_power(velocity, net_force, position, t);
         
         % Calculate power ratio in dominant frequency
-        psd = peaks.^2;
-        total_power = sum(psd);
-        psd_ratio = peaks(peak_idx)^2/total_power;
         
-        psd_array(p,k) = psd_ratio;
+        [pxx, f] = periodogram(position, [], sampling_f);
+        
+        spectral_power = freq.^3.*peaks.^2;
+
+        psd_ratio = max(spectral_power)/sum(spectral_power);
+        
+        psd_array(p,k) = psd_ratio; % p=5, k=3 leads to some doubling
         
         % Keep track of peak force
         force_array(p,k) = max(net_force);
@@ -146,8 +149,8 @@ force_vals = {synch_gain_range, yax, force_array};
 force_data = containers.Map(force_keys, force_vals);
 
 
-ofp_keys = {'synch_gain_range', 'yax', 'conv_array', 'freq_array', 'est_amp_array'};
-ofp_vals = {synch_gain_range, yax, conv_array, freq_array, est_amp_array};
+ofp_keys = {'synch_gain_range', 'yax', 'conv_array', 'freq_array', 'est_amp_array', 'psd_array'};
+ofp_vals = {synch_gain_range, yax, conv_array, freq_array, est_amp_array, psd_array};
 ofp_data = containers.Map(ofp_keys, ofp_vals);
 
 lc_keys = {'limit_pos', 'limit_vel', 'limit_t', 'spectrogram_r3', 'synch_gain_range', 'freq_array', 'lc_array'};

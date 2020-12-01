@@ -23,6 +23,6 @@ for i = 1:10
 end
 %plot_r3_freq(freq_array, sim_param('r3_range'), sim_param('r4_ratio'))
 
-save_ofp_data(ofp_data);
+save_ofp_data(ofp_data, sim_param('r3_range'));
 save_limit_cycle_data(lc_data)
 toc

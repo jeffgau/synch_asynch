@@ -1,5 +1,6 @@
-function plot_power_freq_amp(conv_array,freq_array, psd_array, est_amp_array, synch_gain_range, r3_range, f_n, r4_ratio)
+function plot_power_freq_amp(conv_array,freq_array, est_amp_array, psd_array, synch_gain_range, r3_range, f_n, r4_ratio)
 
+psd_array
 figure('Renderer', 'painters', 'Position', [10 10 900 600])
 k3 = 1; 
 k4 = 1;

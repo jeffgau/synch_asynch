@@ -43,27 +43,33 @@ colors = sns.color_palette("vlag", 10)
 
 sns.set(font_scale = 1, style = 'ticks')
 
-fig, ax = plt.subplots(1, 1, figsize = (2, 2))
+fig, ax = plt.subplots(1, 1, figsize = (1.5, 1.5))
 #pos_plot = pos[int(len(t)/2):]
 pos_plot = pos
 pos_plot = pos_plot - np.median(pos_plot)
+pos_plot /= np.max(np.abs(pos_plot))
 #pos_plot = pos_plot/np.max(np.abs(pos_plot))
 
 #vel_plot = vel[int(len(t)/2):]
 vel_plot = vel
 vel_plot = vel_plot - np.median(vel_plot)
+vel_plot /= np.max(np.abs(vel_plot))
 #vel_plot = vel_plot/np.max(np.abs(vel_plot))
 
 #ax.axis([-1, 1, -1, 1])
 ax.plot(pos_plot, vel_plot, linewidth = 1, color = colors[0], alpha = 1)
-#ax.set_yticks([])
+plt.xticks([-1, 0, 1])
+
+plt.yticks([-1,0, 1])#ax.set_yticks([])
 #ax.set_xticks([])
 #ax.set_aspect('equal', adjustable='box')
-    
+#plt.xticks([-.25, 0, .25])
+
 sns.despine()
 #fig.text(0.5, 0.05, 'position (au)', ha = 'center')
-ax.set_ylabel('velocity (V)')
-ax.set_xlabel('position (V)')
+ax.set_ylabel(r'$\hat{\dot{x}}$ (V)')
+ax.set_xlabel(r'$\hat{x}$ (V)')
+#plt.tight_layout()
 plt.savefig('figures/robobee_limit_cycle.svg', format = 'svg', transparent = True)
 plt.savefig('figures/robobee_limit_cycle.png', format = 'png', dpi = 500)
 plt.show()
@@ -88,20 +94,31 @@ x, y_pos = fourier_analysis_plot(pos_plot, 10000)
 x, y_vel = fourier_analysis_plot(vel_plot, 10000)
 
 
-fig, ax = plt.subplots(1,1,figsize = (2,2))
+fig, ax = plt.subplots(1,1,figsize = (2,1.5))
 sns.set(font_scale = 1, style = 'ticks')
 
 plt.plot(x[:500], y_pos[:500])
 
 plt.xlabel('f (Hz)')
-plt.ylabel('position (V)')
+plt.ylabel(r'$x$ (V)')
 sns.despine()
+#plt.tight_layout()
+
 plt.savefig('figures/robobee_fft.svg', format = 'svg', transparent = True)
 plt.savefig('figures/robobee_fft.png', format = 'png', dpi = 500)
 plt.show()
 
+f_ind = np.where(y_pos == np.max(y_pos))[0][0]
 
+print('robobee oscillation f: %.2f Hz' % (x[f_ind]))
 #plt.plot(pos_plot[3000:4000])
+
 #plt.plot(vel_plot[3000:4000])
+
+# Number of oscillations
+# 20,000 data points at 10 kHz. so 2 seconds
+# Oscillation freq of... 57 Hz.
+
+
 
 

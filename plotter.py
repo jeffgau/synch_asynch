@@ -9,6 +9,18 @@ import seaborn as sns
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
+from scipy.fftpack import fft
+
+
+def fourier_analysis_plot(data, sampling_f):
+    N = len(data)
+    T = 1.0 / sampling_f
+    yf = 2 * fft(data)/N
+    # nyquist_f = np.squeeze(1/(2*T))
+    xf = np.squeeze(np.linspace(0.0, 1.0/(2.0*T), N//2))
+    y_real = np.squeeze(np.abs(yf[0:N//2]))
+    return (xf, y_real)
+
 
 def create_kernel(t, r3, r4, k3, k4):
 # Create a dSA kernel given rates (r3, r4) and gains (k3, k4)
@@ -68,7 +80,9 @@ plt.show()
 
 
 """
+##############################################################################
 Plot t_o vs r3
+##############################################################################
 """
 
 ntests = 100
@@ -141,16 +155,22 @@ for r3 in r3_range:
     plt.plot(f_a[-1000:]/max(f_a))
     plt.show()
     
+#%%
     
 """
+##############################################################################
 plot power freq amp from MATLAB simulation
+##############################################################################
 """
+
 from scipy.io import loadmat
 synch_gain_range = loadmat('data/synch_gain_range.mat')['synch_gain_range'][0].flatten()
 yax = loadmat('data/yax.mat')['yax'][0].flatten()
 power = loadmat('data/power.mat')['power']
 freq = loadmat('data/freq.mat')['freq']
 osc_amp = loadmat('data/osc_amp.mat')['osc_amp']
+psd = loadmat('data/psd.mat')['psd']
+r3_range = loadmat('data/r3_range.mat')['r3_range']
 
 power_df = pd.DataFrame(data = power, columns = synch_gain_range, index = yax)
 power_df = power_df.rename_axis('yax')
@@ -158,18 +178,123 @@ power_df = power_df.rename_axis('synch_gain_range', axis = 'columns')
 
 
 
-fig, ax = plt.subplots(figsize = (5,5))
-sns.heatmap(power_df)
+from matplotlib import colors
 
-ax.set_xticklabels([0, 1])
-ax.set_yticklabels([0, 1])
-ax
+cmap = colors.ListedColormap(['red', 'blue'])
+
+class MidpointNormalize(colors.Normalize):
+	"""
+	Normalise the colorbar so that diverging bars work there way either side from a prescribed midpoint value)
+
+	e.g. im=ax1.imshow(array, norm=MidpointNormalize(midpoint=0.,vmin=-100, vmax=100))
+	"""
+	def __init__(self, vmin=None, vmax=None, midpoint=None, clip=False):
+		self.midpoint = midpoint
+		colors.Normalize.__init__(self, vmin, vmax, clip)
+
+	def __call__(self, value, clip=None):
+		# I'm ignoring masked values and all kinds of edge cases to make a
+		# simple example...
+		x, y = [self.vmin, self.midpoint, self.vmax], [0, 0.5, 1]
+		return np.ma.masked_array(np.interp(value, x, y), np.isnan(value))
+
+X, Y = np.meshgrid(synch_gain_range, yax)
+fig, ax = plt.subplots(2, 1, figsize = (3,5))
+sns.set(font_scale = 1, style = 'ticks')
+#pos = ax[0].imshow(power_df[::-1], cmap = 'Reds', extent = [np.min(synch_gain_range), np.max(synch_gain_range),0.01, 1])
+
+pos = ax[1].pcolor(X, Y, power_df, cmap = 'Reds', edgecolors = 'none', linewidth = 0)
+ax[1].set_yscale('log')
+cbar = fig.colorbar(pos, ax = ax[1])#,fraction=0.046, pad=0.04) 
+cbar.ax.set_ylabel('power (au)')
+ax[1].set_ylabel(r'$t_o/T_n$')
+ax[1].axis('equal')
+freqcmap = colors.LinearSegmentedColormap.from_list('freqcmap', ['#FFFFFF', '#B2CCFB','#FF3032'])
+#fig, ax = plt.subplots(1, 1, figsize = (3,3))
+sns.set(font_scale = 1, style = 'ticks')
+pos = ax[0].pcolor(X,Y, freq, cmap = freqcmap, norm=MidpointNormalize(midpoint=1,vmin=0, vmax=4), vmin = 0, vmax = 4, edgecolors = None, linewidth = 0)
+#ax.set_ysclale('log')
+cbar = fig.colorbar(pos, ax = ax[0])#,fraction=0.046, pad=0.04) 
+cbar.ax.set_ylabel(r'$f/f_s$')
+cbar.set_ticks([0, 1, 2, 3, 4])
+#pos.set_clim(0,4)
+ax[0].set_ylabel(r'$t_o/T_n$')
+ax[1].set_xlabel(r'$K_r$')
+ax[0].set_yscale('log')
+ax[0].axis('equal')
+
+#ax[0].scatter(1, 0.55)
 sns.despine()
+#plt.tight_layout()
+plt.savefig('figures/osc_meaurements.svg', format = 'svg', transparent = True)
+plt.savefig('figures/osc_measurements.png', format = 'png', dpi = 500)
+
+plt.show()
+
+#%% Plot freq alone
+
+
+X, Y = np.meshgrid(synch_gain_range, yax)
+fig, ax = plt.subplots(1, 1, figsize = (6.3,5))
+sns.set(font_scale = 1, style = 'ticks')
+#pos = ax[0].imshow(power_df[::-1], cmap = 'Reds', extent = [np.min(synch_gain_range), np.max(synch_gain_range),0.01, 1])
+
+freqcmap = colors.LinearSegmentedColormap.from_list('freqcmap', ['#FFFFFF', '#B2CCFB','#FF3032'])
+#fig, ax = plt.subplots(1, 1, figsize = (3,3))
+sns.set(font_scale = 1, style = 'ticks')
+pos = ax.pcolor(X,Y, freq, cmap = freqcmap, norm=MidpointNormalize(midpoint=1,vmin=0, vmax=4), vmin = 0, vmax = 4, antialiased = True,edgecolor = 'face', linewidth = 1)
+#ax.set_ysclale('log')
+cbar = fig.colorbar(pos, ax = ax)#,fraction=0.046, pad=0.04) 
+cbar.ax.set_ylabel(r'$f/f_s$')
+cbar.set_ticks([0, 1, 2, 3, 4])
+#pos.set_clim(0,4)
+#ax.set_ylabel(r'$t_o/T_n$')
+ax.set_yscale('log')
+ax.axis('equal')
+ax.set_xticks([])
+ax.set_yticks([])
+#ax[0].scatter(1, 0.55)
+sns.despine()
+plt.axis('off')
+#plt.tight_layout()
+plt.savefig('figures/freq.svg', format = 'svg', transparent = True)
+plt.savefig('figures/freq.png', format = 'png', dpi = 500)
+
 plt.show()
 
 
+
+
+#%%
+fig, ax = plt.subplots(1, 1, figsize = (3,3))
+sns.set(font_scale = 1, style = 'ticks')
+pos = ax.imshow(psd[::-1], cmap = 'seismic', extent = [np.min(synch_gain_range), np.max(synch_gain_range),0.01, 1], vmin = 0, vmax = 1)
+#ax.set_ysclale('log')
+cbar = fig.colorbar(pos, ax = ax) 
+cbar.ax.set_ylabel('energy ratio (au)')
+plt.xlabel(r'$K_r$')
+plt.ylabel(r'$t_o/T_n$')
+sns.despine()
+plt.show()
+
 """
+plot freq vs r3
+"""
+sns.set(font_scale = 1, style = 'ticks')
+
+fig, ax = plt.subplots(1,1, figsize =(3,3))
+freq_plot = freq[:,0] * 16
+ax.scatter(freq_plot, r3_range)
+plt.axis([0, 200, 0, 1000])
+sns.despine()
+plt.tight_layout()
+plt.show()
+
+#%%
+"""
+##############################################################################
 plot limit cycle data
+##############################################################################
 """
 synch_gain_range = loadmat('data/limit_cycle/synch_gain_range.mat')['synch_gain_range'][0].flatten()
 
@@ -177,6 +302,7 @@ t = loadmat('data/limit_cycle/t.mat')['t'][0].flatten()
 r3 = loadmat('data/limit_cycle/r3.mat')['r3'][0].flatten()
 pos = loadmat('data/limit_cycle/pos.mat')['pos']
 vel = loadmat('data/limit_cycle/vel.mat')['vel']
+
 
 pos = pos[:len(t),:]
 vel = vel[:len(t),:]
@@ -224,6 +350,306 @@ plt.show()
 
 
 
+#%%
+lc_array = loadmat('data/limit_cycle/lc_array.mat')['lc_array']
+
+slice_idx = 5;
+lc_array = lc_array[::2,::2, :, :]
+
+colors = sns.color_palette("vlag", len(synch_gain_range))
+
+j_max, i_max, _, _ = lc_array.shape
+
+fig, ax = plt.subplots(10, 10, figsize = (5, 5))
+sns.set(font_scale = 1, style = 'ticks')
+
+power_cmap = 'reds'
+for j in range(j_max):
+    ax_j = 9 - j
+    for i in range(i_max):
+        
+        pos = np.squeeze(lc_array[j, i, 0, 90000:])
+        vel = np.squeeze(lc_array[j, i, 1, 90000:])
+        pos_plot = pos[::20]
+        pos_plot = pos_plot - np.median(pos_plot)
+        pos_plot = pos_plot/np.max(np.abs(lc_array[:,:,0,:])) # Normalize by the same 
+        
+        vel_plot = vel[::20]
+        vel_plot = vel_plot - np.median(vel_plot)
+        vel_plot = vel_plot/np.max(np.abs(lc_array[:,:,1,:]))
+        
+        ax[ax_j,i].axis([-1.1, 1.1, -1.1, 1.1])
+        ax[ax_j,i].plot(pos_plot, vel_plot, linewidth = .5, color ='#262626', alpha = 1)
+        ax[ax_j,i].set_yticks([])
+        ax[ax_j,i].set_xticks([])
+        ax[ax_j,i].set_aspect('equal', adjustable='box')
+        ax[ax_j,i].patch.set_alpha(0)
+        
+    sns.despine()
+ax[5,0].set_ylabel('velocity (au)')
+ax[9,5].set_xlabel('position (au)')
+
+fig.text(0.5, 0.05, r'$K_r$', ha = 'center')
+fig.text(0.02, 0.5, r'$t_o/T_n$',  va = 'center', rotation = 'vertical')
+plt.savefig('figures/limit_cycle.svg', format = 'svg')
+plt.savefig('figures/limit_cycle.png', format = 'png', dpi = 500)
+
+plt.show()
 
 
 
+X, Y = np.meshgrid(synch_gain_range, yax)
+fig,ax = plt.subplots(1,1,figsize = (5.3,5))
+sns.set(font_scale = 1, style = 'ticks')
+pos = ax.pcolor(X, Y, power_df, cmap = 'Reds', edgecolors = 'none')
+
+plt.xlabel(r'$K_r$')
+plt.ylabel(r'$t_o/T_n$')
+ax.set_yscale('log')
+plt.axis([0, 1, 0.01, 1])
+#ax.set_yticks([0.01, 0.01, 1])
+#ax.set_xticks([0, 0.5, 1])
+#ax.set_xticks([])
+#ax.set_yticks([])
+sns.despine(offset = 20)
+plt.tight_layout()
+plt.savefig('figures/axes.svg', format = 'svg', transparent = True)
+plt.show()
+
+#%%
+"""
+##############################################################################
+plot roboflapper limit cycles
+##############################################################################
+"""
+
+flapper_data = loadmat('data/20201122_flapper/roboflapperParamSweep_20x20_02to1.mat')
+raw_data = flapper_data['raw_data'] # raw_data[20x10][1]
+
+nSynch = 20
+synch_gain_range = np.linspace(0, 1, nSynch)
+r3_range = [306.564856593887, 249.487438045280, 203.036911777704, 165.234722305919, 134.470689178953, 109.434421506060, 89.0595019887825, 72.4780629835994, 58.9838197671064, 48.0019864094016, 39.0647928253259, 31.7915601548261, 25.8724857852742, 21.0554473404036, 17.1352635531001, 13.9449545900065, 11.3486295623484, 9.23569826722170, 7.51616060904457, 6.11677305455622]
+r3_range = np.logspace(-1.7, 0, 20)
+
+print('to do: update r3_range')
+t = raw_data[0,0][0][0][0]
+
+r3_range = r3_range[::]
+raw_data = raw_data[::,::]
+
+
+max_pos = 0
+max_vel = 0
+
+freq_total = []
+for j in range(len(r3_range)):
+    ax_j = len(r3_range) - j - 1
+    freq = []
+    for i in range(len(synch_gain_range)):
+        pos = np.squeeze(raw_data[j, i][0][0][1][0][0][0]) # position
+        vel = np.squeeze(raw_data[j, i][0][0][1][0][1][0]) # filtered velocity
+        
+        # Extract osc frqe
+        pos_fft = pos[30000:]
+        pos_fft = pos_fft - np.mean(pos_fft)
+        pos_freq, pos_amp = fourier_analysis_plot(pos_fft, 1000)
+        max_ind = np.where(pos_amp == np.max(pos_amp))[0][0]
+        freq.append(pos_freq[max_ind])
+        
+        max_pos = max(max_pos, np.max(pos))
+        max_vel = max(max_vel, np.max(vel))        
+    freq_total.append(freq)
+
+f_n = 2.3908 *1.56
+
+freq_total = np.squeeze(np.array(freq_total))/f_n# dimensions are: synch_gain_range (x) by r3_range (y)
+#plt.pcolor(freq_total)
+
+
+#fig, ax = plt.subplots(len(r3_range), nSynch, figsize = (3, 3))
+
+sns.set(font_scale = 1, style = 'ticks')
+raw_data_plot = raw_data[::2, ::2]
+
+x, y = raw_data_plot.shape
+fig, ax = plt.subplots(x, y, figsize = (5, 5))
+
+for j in range(x):
+    ax_j = x - j - 1
+    for i in range(y):
+        pos = np.squeeze(raw_data_plot[j, i][0][0][1][0][0][0]) # position
+        vel = np.squeeze(raw_data_plot[j, i][0][0][1][0][1][0]) # filtered velocity
+        pos_plot = pos[-2000:]
+        pos_plot = pos_plot - np.median(pos_plot)
+        pos_plot = pos_plot/max_pos # Normalize by the same 
+        
+        vel_plot = vel[-2000:]
+        vel_plot = vel_plot - np.median(vel_plot)
+        vel_plot = vel_plot/max_vel
+        
+        ax[ax_j,i].axis([-1.1, 1.1, -1.1, 1.1])
+        ax[ax_j,i].plot(pos_plot, vel_plot, linewidth = .5, color ='#262626', alpha = 1)
+        ax[ax_j,i].set_yticks([])
+        ax[ax_j,i].set_xticks([])
+        ax[ax_j,i].set_aspect('equal', adjustable='box')
+        ax[ax_j,i].patch.set_alpha(0)
+
+    sns.despine()
+ax[9,0].set_ylabel(r'$\hat{\dot{x}}$')
+ax[9,0].set_xlabel(r'$\hat{x}$')
+
+#fig.text(0.5, 0.05, r'$K_r$', ha = 'center')
+#fig.text(0.02, 0.5, r'$t_o/T_n$',  va = 'center', rotation = 'vertical')
+plt.savefig('figures/flapper_limit_cycle.svg', format = 'svg', rasterized = True)
+plt.savefig('figures/flapper_limit_cycle.png', format = 'png', dpi = 500)
+
+plt.show()
+
+T_n = 1/f_n
+r4_ratio = 0.62
+
+r3_range = np.array(r3_range)
+t_o = np.log(1/r4_ratio)/((1-r4_ratio) * r3_range)
+
+yax = t_o/T_n
+
+X, Y = np.meshgrid(synch_gain_range, yax)
+fig,ax = plt.subplots(1,1,figsize = (5.3,5))
+sns.set(font_scale = 1, style = 'ticks')
+pos = ax.pcolor(X, Y, power_df, cmap = 'Reds', edgecolors = 'none')
+
+plt.xlabel(r'$K_r$')
+plt.ylabel(r'$t_o/T_n$')
+ax.set_yscale('log')
+#plt.axis([0, 1, 0.01, 1])
+#ax.set_yticks([0.01, 0.01, 1])
+#ax.set_xticks([0, 0.5, 1])
+#ax.set_xticks([])
+#ax.set_yticks([])
+sns.despine(offset = 5)
+plt.tight_layout()
+plt.savefig('figures/flapper_axes.svg', format = 'svg', transparent = True)
+plt.show()
+
+
+"""
+##############################################################################
+plot roboflapper heat maps
+##############################################################################
+"""
+
+from scipy.io import loadmat
+synch_gain_range = loadmat('data/20201122_flapper/synch_gain_range.mat')['synch_gain_range'][0].flatten()
+power = loadmat('data/20201122_flapper/power.mat')['conv_array']
+freq = loadmat('data/20201122_flapper/freq.mat')['freq_array']
+osc_amp = loadmat('data/20201122_flapper/osc_amp.mat')['est_amp_array']
+r3_range = loadmat('data/20201122_flapper/r3_range.mat')['r3_range']
+
+#power_df = pd.DataFrame(data = power, columns = synch_gain_range, index = yax)
+#power_df = power_df.rename_axis('yax')
+#power_df = power_df.rename_axis('synch_gain_range', axis = 'columns')
+
+f_n = 2.3908
+T_n = 1/f_n
+r4_ratio = 0.62
+
+r3_range = np.array(r3_range)
+t_o = np.log(1/r4_ratio)/((1-r4_ratio) * r3_range)
+
+yax = t_o/T_n
+
+
+from matplotlib import colors
+
+cmap = colors.ListedColormap(['red', 'blue'])
+
+class MidpointNormalize(colors.Normalize):
+	"""
+	Normalise the colorbar so that diverging bars work there way either side from a prescribed midpoint value)
+
+	e.g. im=ax1.imshow(array, norm=MidpointNormalize(midpoint=0.,vmin=-100, vmax=100))
+	"""
+	def __init__(self, vmin=None, vmax=None, midpoint=None, clip=False):
+		self.midpoint = midpoint
+		colors.Normalize.__init__(self, vmin, vmax, clip)
+
+	def __call__(self, value, clip=None):
+		# I'm ignoring masked values and all kinds of edge cases to make a
+		# simple example...
+		x, y = [self.vmin, self.midpoint, self.vmax], [0, 0.5, 1]
+		return np.ma.masked_array(np.interp(value, x, y), np.isnan(value))
+
+X, Y = np.meshgrid(synch_gain_range, yax)
+fig, ax = plt.subplots(2, 1, figsize = (3,5))
+sns.set(font_scale = 1, style = 'ticks')
+#pos = ax[0].imshow(power_df[::-1], cmap = 'Reds', extent = [np.min(synch_gain_range), np.max(synch_gain_range),0.01, 1])
+
+pos = ax[1].pcolor(X, Y, power, cmap = 'Reds', edgecolors = 'face', linewidth = 1)
+ax[1].set_yscale('log')
+cbar = fig.colorbar(pos, ax = ax[1])#,fraction=0.046, pad=0.04) 
+cbar.ax.set_ylabel('power (au)')
+#ax[1].set_ylabel(r'$t_o/T_n$')
+
+ax[1].axis('equal')
+
+#freqcmap = colors.LinearSegmentedColormap.from_list('freqcmap', ['black', 'blue', 'red'])
+#fig, ax = plt.subplots(1, 1, figsize = (3,3))
+sns.set(font_scale = 1, style = 'ticks')
+pos = ax[0].pcolor(X,Y, freq_total, cmap = freqcmap, norm=MidpointNormalize(midpoint=1,vmin=0, vmax=4), vmin = 0, vmax = 4, edgecolors = 'face', linewidth = 1)
+#ax.set_ysclale('log')
+cbar = fig.colorbar(pos, ax = ax[0])#,fraction=0.046, pad=0.04) 
+cbar.ax.set_ylabel(r'$f/f_s$')
+cbar.set_ticks([0, 1, 2, 3, 4])
+#pos.set_clim(0,4)
+ax[0].set_ylabel(r'$t_o/T_n$')
+ax[1].set_ylabel(r'$t_o/T_n$')
+
+ax[1].set_xlabel(r'$K_r$')
+#ax[0].set_xlabel(r'$K_r$')
+ax[0].set_xticks([])
+
+ax[0].set_yscale('log')
+ax[0].axis('equal')
+
+#ax[0].scatter(1, 0.55)
+sns.despine()
+#plt.tight_layout()
+plt.savefig('figures/flapper_osc_meaurements.svg', format = 'svg', transparent = True)
+plt.savefig('figures/flapper_osc_measurements.png', format = 'png', dpi = 500)
+
+plt.show()
+
+#%% Plot freq alone
+
+
+X, Y = np.meshgrid(synch_gain_range, yax)
+fig, ax = plt.subplots(1, 1, figsize = (6.23,5))
+sns.set(font_scale = 1, style = 'ticks')
+#pos = ax[0].imshow(power_df[::-1], cmap = 'Reds', extent = [np.min(synch_gain_range), np.max(synch_gain_range),0.01, 1])
+
+
+
+freqcmap = colors.LinearSegmentedColormap.from_list('freqcmap', ['#FFFFFF', '#B2CCFB','#FF3032'])
+#fig, ax = plt.subplots(1, 1, figsize = (3,3))
+sns.set(font_scale = 1, style = 'ticks')
+pos = ax.pcolor(X,Y, freq_total, cmap = freqcmap, norm=MidpointNormalize(midpoint=1,vmin=0, vmax=4), vmin = 0, vmax = 4, edgecolors = 'face', linewidth = 1)
+#ax.set_ysclale('log')
+cbar = fig.colorbar(pos, ax = ax)#,fraction=0.046, pad=0.04) 
+cbar.ax.set_ylabel(r'$f/f_s$')
+cbar.set_ticks([0, 1, 2, 3, 4])
+#pos.set_clim(0,4)
+ax.set_ylabel(r'$t_o/T_n$')
+
+#ax[0].set_xlabel(r'$K_r$')
+ax.set_xticks([])
+
+ax.set_yscale('log')
+ax.axis('equal')
+plt.axis('off')
+#ax[0].scatter(1, 0.55)
+sns.despine()
+#plt.tight_layout()
+plt.savefig('figures/flapper_freq.svg', format = 'svg', transparent = True)
+plt.savefig('figures/flapper_freq.png', format = 'png', dpi = 500)
+
+plt.show()
