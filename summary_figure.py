@@ -11,7 +11,7 @@ import numpy as np
 
 
 sns.set(font_scale = 1, style = 'ticks')
-fig, ax = plt.subplots(1,1, figsize = (4,1))
+fig, ax = plt.subplots(1,1, figsize = (3,.75))
 
 bee = 20
 locust = 1 #Josephson2000
@@ -23,7 +23,7 @@ lucilia = 156/10 # Roeder 1951
 
 
 vespa = 119/22 # Roeder1951                                                             # Hymenoptera
-c_mutabilis = 1/(76/21) # Josephson2000
+c_mutabilis = (76/21) # Josephson2000
 d_melanogaster = 40 # Gordon2006
 
 
@@ -34,16 +34,16 @@ plt.plot([0, 0.1], [1, 1], c = '#0071BC', linewidth = 5, solid_capstyle = 'butt'
 plt.plot([0.9, 1], [c_mutabilis, c_mutabilis], c = '#C1272D', linewidth = 5, solid_capstyle = 'butt')            # Coleoptera
 #plt.plot([0.9, 1], [d_melanogaster, d_melanogaster], c = '#C1272D', linewidth = 3)      # Diptera
 
-plt.fill_between([0.1, 0.9], 0, 4, color = 'k', alpha = 0.2, linewidth = 0)
+#plt.fill_between([0.1, 0.9], 0, 4, color = 'k', alpha = 0.2, linewidth = 0)
 
-plt.plot([0.1, 0.9], [1, c_mutabilis], linewidth = 5, solid_capstyle = 'butt', c = '#BD60A5', alpha = 0.5)
+plt.plot([0.1, 0.9], [1, c_mutabilis], linewidth = 5, solid_capstyle = 'butt', c = 'k', alpha = 1, linestyle = 'dashed')
 
-plt.plot([0.1, 0.5, 0.5, 0.9], [1, 1, c_mutabilis, c_mutabilis], linewidth = 5, solid_capstyle = 'butt', c = '#2E9E46', alpha = 0.5)
+plt.plot([0.1, 0.5, 0.5, 0.9], [1, 1, c_mutabilis, c_mutabilis], linewidth = 5, solid_capstyle = 'butt', c = 'k', alpha = 1, linestyle = 'dashed')
 
 
 ax.set_xlim(0, 1)
-ax.set_ylim(0, 1.1)
-ax.set_yticks([0, 1])
+ax.set_ylim(0, 4.1)
+ax.set_yticks([0, 1, 4])
 ax.set_ylabel('$f_s/f$')
 #ax.set_xlabel('$K_r$')
 ax.set_xticks([])
@@ -130,3 +130,20 @@ ax.set_xlabel('$t$')
 sns.despine()
 plt.savefig('figures/synch_osc.svg', format = 'svg')
 plt.show()
+
+#%% Plot sum of sines
+
+t = np.linspace(0, 10, 1000)
+A1 = 1
+A2 = .5
+A3 = 0.3
+w1 = 10
+w2 = 25
+w3 = 39
+
+x = A1*np.sin(w1*t) + A2*np.sin(w2*t) + A3 *np.sin(w3*t)
+fig, ax = plt.subplots(1,1, figsize = (5,1))
+plt.plot(t,x, linewidth = 2, c = 'k')
+sns.despine()
+plt.axis('off')
+plt.savefig('figures/sum_of_sines.svg', format = 'svg')

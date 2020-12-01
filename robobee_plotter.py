@@ -94,10 +94,11 @@ x, y_pos = fourier_analysis_plot(pos_plot, 10000)
 x, y_vel = fourier_analysis_plot(vel_plot, 10000)
 
 
-fig, ax = plt.subplots(1,1,figsize = (2,1.5))
+fig, ax = plt.subplots(1,1,figsize = (3,1.5))
 sns.set(font_scale = 1, style = 'ticks')
+plt.plot([90, 90], [0, np.max(y_pos[:500])], linewidth = 3, c = 'k')
 
-plt.plot(x[:500], y_pos[:500])
+plt.plot(x[:500], y_pos[:500], linewidth = 3)
 
 plt.xlabel('f (Hz)')
 plt.ylabel(r'$x$ (V)')
