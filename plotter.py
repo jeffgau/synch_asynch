@@ -235,16 +235,16 @@ plt.show()
 
 
 X, Y = np.meshgrid(synch_gain_range, yax)
-fig, ax = plt.subplots(1, 1, figsize = (6.3,5))
+fig, ax = plt.subplots(1, 1, figsize = (6,4.8))
 sns.set(font_scale = 1, style = 'ticks')
 #pos = ax[0].imshow(power_df[::-1], cmap = 'Reds', extent = [np.min(synch_gain_range), np.max(synch_gain_range),0.01, 1])
 
 #freqcmap = colors.LinearSegmentedColormap.from_list('', ['#E0DB26', '#B2CCFB','#FF3032'])
-freqcmap = colors.LinearSegmentedColormap.from_list('freqcmap', ['white', 'red'])
-freqcmap.set_bad('#B2CCFB')
+freqcmap = colors.LinearSegmentedColormap.from_list('freqcmap', ['white', '#FF272D'])
+freqcmap.set_bad('#8FB0ED')
 
 
-test_freq = np.ma.masked_values(freq, 1, rtol = 1E-3, copy = True)
+test_freq = np.ma.masked_values(freq, 1, rtol = 1E-2, copy = True)
 #fig, ax = plt.subplots(1, 1, figsize = (3,3))
 sns.set(font_scale = 1, style = 'ticks')
 #pos = ax.pcolormesh(X,Y, test_freq, cmap = cmap, norm=MidpointNormalize(midpoint=1,vmin=0, vmax=3), vmin = 0, vmax = 3, edgecolor = 'face', linewidth = 1)
@@ -545,7 +545,7 @@ plt.tight_layout()
 plt.savefig('figures/flapper_axes.svg', format = 'svg', transparent = True)
 plt.show()
 
-
+#%%
 """
 ##############################################################################
 plot roboflapper heat maps
@@ -636,17 +636,20 @@ plt.show()
 #%% Plot freq alone
 
 
+
+
+freqcmap = colors.LinearSegmentedColormap.from_list('freqcmap', ['white', '#FF272D'])
+freqcmap.set_bad('#8FB0ED')
+
 X, Y = np.meshgrid(synch_gain_range, yax)
 fig, ax = plt.subplots(1, 1, figsize = (6.23,5))
 sns.set(font_scale = 1, style = 'ticks')
 #pos = ax[0].imshow(power_df[::-1], cmap = 'Reds', extent = [np.min(synch_gain_range), np.max(synch_gain_range),0.01, 1])
 
+test_freq_total = np.ma.masked_values(freq_total, 1, atol = 1E-2, copy = True)
 
-
-freqcmap = colors.LinearSegmentedColormap.from_list('freqcmap', ['#FFFFFF', '#B2CCFB','#FF3032'])
-#fig, ax = plt.subplots(1, 1, figsize = (3,3))
 sns.set(font_scale = 1, style = 'ticks')
-pos = ax.pcolor(X,Y, freq_total, cmap = freqcmap, norm=MidpointNormalize(midpoint=1,vmin=0, vmax=4), vmin = 0, vmax = 4, edgecolors = 'face', linewidth = 1)
+pos = ax.pcolormesh(X,Y, test_freq_total, cmap = freqcmap, vmin = 0, vmax = 4, edgecolors = 'face', linewidth = 1)
 #ax.set_ysclale('log')
 cbar = fig.colorbar(pos, ax = ax)#,fraction=0.046, pad=0.04) 
 cbar.ax.set_ylabel(r'$f/f_s$')
@@ -667,3 +670,11 @@ plt.savefig('figures/flapper_freq.svg', format = 'svg', transparent = True)
 plt.savefig('figures/flapper_freq.png', format = 'png', dpi = 500)
 
 plt.show()
+
+#%% Test
+
+data = np.zeros((10,10))
+
+data[0,:] = np.linspace(0, 1, 10)
+
+plt.pcolor(data)

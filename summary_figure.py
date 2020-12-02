@@ -8,6 +8,7 @@ Created on Mon Nov 30 14:42:17 2020
 import seaborn as sns
 import matplotlib.pyplot as plt
 import numpy as np
+from matplotlib import colors
 
 
 sns.set(font_scale = 1, style = 'ticks')
@@ -51,6 +52,26 @@ sns.despine()
 plt.savefig('figures/summary_fig.svg', format = 'svg')
 plt.show()
 
+#%% Make summary heatmap that includes r3
+
+data = np.array(np.zeros((10,10)))
+
+data[:,-1] = np.linspace(0, 4, 10)
+data[:,0] = -1
+
+cmap = colors.LinearSegmentedColormap.from_list('freqcmap', ['white', 'red'])
+cmap.set_under('b')
+
+fig, ax = plt.subplots(1,1, figsize = (3,1))
+sns.set(font_scale = 1, style = 'ticks')
+heat_map = plt.pcolor(data, cmap = cmap, edgecolor = 'face', linewidth = 1, vmin = 0, vmax = 4)
+cbar = fig.colorbar(heat_map, ax = ax)#,fraction=0.046, pad=0.04) 
+ax.set_xticks([])
+ax.set_yticks([])
+plt.axis('off')
+sns.despine()
+plt.savefig('figures/summary_fig_square.svg', format = 'svg')
+plt.show()
 
 #%% Plot resonance response
 
