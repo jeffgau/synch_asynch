@@ -4,7 +4,7 @@ function param = load_simulation_param(system, f_n)
 
 r4_ratio = 0.62;
 if strcmp(system, 'moth')
-    ntests  = 100;
+    ntests  = 10;
     synch_gain_range = linspace(0, 1, ntests);
     t_end       = 10;
     sampling_f = 10000;

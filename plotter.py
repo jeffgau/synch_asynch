@@ -12,6 +12,16 @@ import pandas as pd
 from scipy.fftpack import fft
 
 
+
+def find_nearest(array,value):
+    """
+    Find nearest value in array
+    """
+    array = np.asarray(array)
+    idx = (np.abs(array-value)).argmin()
+    return idx
+
+
 def fourier_analysis_plot(data, sampling_f):
     N = len(data)
     T = 1.0 / sampling_f
@@ -163,6 +173,11 @@ plot power freq amp from MATLAB simulation
 ##############################################################################
 """
 
+"""
+Notes:
+    
+  if data.shape = (20, 10), then the resulting pcolor has 20 rows and 10 columns.  
+"""
 from scipy.io import loadmat
 synch_gain_range = loadmat('data/synch_gain_range.mat')['synch_gain_range'][0].flatten()
 yax = loadmat('data/yax.mat')['yax'][0].flatten()
@@ -231,7 +246,13 @@ plt.savefig('figures/osc_measurements.png', format = 'png', dpi = 500)
 
 plt.show()
 
-#%% Plot freq alone
+
+#%%
+"""
+##############################################################################
+Plot freq alone from simulation
+##############################################################################
+"""
 
 
 X, Y = np.meshgrid(synch_gain_range, yax)
@@ -266,6 +287,101 @@ plt.axis('off')
 #plt.tight_layout()
 plt.savefig('figures/freq.svg', format = 'svg', transparent = True)
 plt.savefig('figures/freq.png', format = 'png', dpi = 500)
+
+plt.show()
+
+#%%
+"""
+##############################################################################
+Plot Manduca power slice from simulation
+##############################################################################
+"""
+
+from scipy.io import loadmat
+synch_gain_range = loadmat('data/synch_gain_range.mat')['synch_gain_range'][0].flatten()
+yax = loadmat('data/yax.mat')['yax'][0].flatten()
+power = loadmat('data/power.mat')['power']
+freq = loadmat('data/freq.mat')['freq']
+osc_amp = loadmat('data/osc_amp.mat')['osc_amp']
+psd = loadmat('data/psd.mat')['psd']
+r3_range = loadmat('data/r3_range.mat')['r3_range']
+
+power_df = pd.DataFrame(data = power, columns = synch_gain_range, index = yax)
+power_df = power_df.rename_axis('yax')
+power_df = power_df.rename_axis('synch_gain_range', axis = 'columns')
+
+
+
+from matplotlib import colors
+import scipy
+
+
+# Manduca t_o/T_n = 0.37
+
+m_val = 0.37
+moth_slice = find_nearest(yax, m_val)
+
+asynch_power = power[:,0] # slice along K_r = 0
+
+asynch_slice = np.where(asynch_power == np.max(asynch_power))[0][0]
+
+fig, ax = plt.subplots(1,1, figsize = (2.4, 1))
+sns.set(font_scale = 1, style = 'ticks')
+plt.plot(synch_gain_range, power[moth_slice,:], c = '#0071BC', linewidth = 2)
+plt.plot(synch_gain_range, power[asynch_slice,:], c = '#C1272D', linewidth = 2)
+
+ax.set_xticks([0, 0.5, 1])
+ax.set_xlabel('$K_r$')
+ax.set_ylabel('power (au)')
+ax.axis([0, 1, 0, np.max(power)])
+sns.despine()
+plt.savefig('figures/power_slices.svg', format = 'svg')
+plt.show()
+
+
+power_cmap = colors.LinearSegmentedColormap.from_list('freqcmap', ['white', '#6018D1'])
+#freqcmap.set_bad('#8FB0ED')
+
+
+
+X, Y = np.meshgrid(synch_gain_range, yax)
+fig, ax = plt.subplots(1, 1, figsize = (3,2.3))
+sns.set(font_scale = 1, style = 'ticks')
+#pos = ax[0].imshow(power_df[::-1], cmap = 'Reds', extent = [np.min(synch_gain_range), np.max(synch_gain_range),0.01, 1])
+
+pos = ax.pcolor(X, Y, power_df, cmap = power_cmap, edgecolors = 'face', linewidth = .1)
+
+freq_smoothed = scipy.ndimage.filters.gaussian_filter(freq, sigma = 0.8)
+power_smoothed = scipy.ndimage.filters.gaussian_filter(power, sigma = 0.8)
+cs = ax.contour(X, Y, freq_smoothed, levels = [0.99, 1.01], colors = '#808080', linewidths = 1.5, linestyles = '-', alpha = 1)
+#cs = ax.contourf(X, Y, freq_smoothed, levels = [0.99, 1.01], hatches = ['//', '\\' ], linewidths = 2)
+
+#cs = ax.contour(X, Y, power_smoothed, levels = [15], colors = 'r', linewidths = 1.5, linestyles = '-', alpha = 1)
+#cs = ax.contour(X, Y, power_smoothed, levels = [np.max(power_smoothed)*0.1], colors = '#B3B3B3', alpha = 0.4)
+cs = ax.contourf(X, Y, power, levels = [np.min(power), np.max(power)*0.1], colors = '#B3B3B3', alpha = 0.4)
+
+ax.scatter(0.9, yax[moth_slice], c = '#0071BC', s = 20)
+ax.scatter(0.05, yax[asynch_slice], c = '#C1272D', s = 20)
+#ax.clabel(cs, inline = 1, fontsize = 6)
+ax.set_yscale('log')
+cbar = fig.colorbar(pos, ax = ax)#,fraction=0.046, pad=0.04) 
+cbar.ax.set_ylabel('power (au)')
+ax.set_ylabel(r'$t_o/T_n$')
+ax.axis('equal')
+#fig, ax = plt.subplots(1, 1, figsize = (3,3))
+sns.set(font_scale = 1, style = 'ticks')
+#pos.set_clim(0,4)
+ax.set_ylabel(r'$t_o/T_n$')
+ax.set_xlabel(r'$K_r$')
+ax.set_xticks([0, 0.5, 1])
+ax.axis('equal')
+#plt.plot([0, 1], [m_val, m_val], c = '#0071BC', linewidth = 3, solid_capstyle = 'butt')
+#plt.plot([0, 1], [yax[asynch_slice], yax[asynch_slice]], c = '#C1272D', linewidth = 3, solid_capstyle = 'butt')
+#ax[0].scatter(1, 0.55)
+sns.despine()
+#plt.tight_layout()
+plt.savefig('figures/power.svg', format = 'svg', transparent = True)
+plt.savefig('figures/power.png', format = 'png', dpi = 500)
 
 plt.show()
 
@@ -358,6 +474,10 @@ plt.show()
 
 
 #%%
+"""
+Plot LC data for entire matrix
+"""
+
 lc_array = loadmat('data/limit_cycle/lc_array.mat')['lc_array']
 
 """
@@ -365,6 +485,13 @@ https://stackoverflow.com/questions/17316880/reading-v-7-3-mat-file-in-python
 import hdf5storage
 mat = hdf5storage.loadmat('test.mat')
 """
+import h5py
+arrays = {}
+
+f = h5py.File('data/limit_cycle/lc_array.mat')
+
+for k, v in f.items():
+    arrays[k] = np.array(v)
 
 
 slice_idx = 5;

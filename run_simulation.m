@@ -45,8 +45,10 @@ limit_t = [];
 
 
 for p = 1:ntests
-    
-    for k = 1:ntests % Load variables for parallel sim
+    % p sweeps over r3
+    for k = 1:ntests
+        % k sweeps over K_r
+        
         p, k
         
         % Sweep through parameters to generate forcing functions
