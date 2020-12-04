@@ -250,6 +250,54 @@ plt.show()
 #%%
 """
 ##############################################################################
+Plot slices from simulation
+##############################################################################
+"""
+# Manduca t_o/T_n = 0.37
+
+m_val = 0.37
+moth_slice = find_nearest(yax, m_val)
+
+asynch_power = power[:,0] # slice along K_r = 0
+
+asynch_slice = np.where(asynch_power == np.max(asynch_power))[0][0]  
+transition_slice = find_nearest(yax, .35)
+
+fig, ax = plt.subplots(1,1, figsize = (2.4, 1))
+sns.set(font_scale = 1, style = 'ticks')
+plt.plot(synch_gain_range, power[moth_slice,:], c = '#0071BC', linewidth = 2)
+plt.plot(synch_gain_range, power[asynch_slice,:], c = '#C1272D', linewidth = 2)
+#plt.plot(synch_gain_range, power[transition_slice,:], c = 'k', linewidth = 2, linestyle = '--')
+
+ax.set_xticks([0, 0.5, 1])
+ax.set_xlabel('$K_r$')
+ax.set_ylabel('power (au)')
+ax.axis([0, 1, 0, np.max(power)])
+sns.despine()
+plt.savefig('figures/power_slices.svg', format = 'svg')
+plt.show()
+
+
+fig, ax = plt.subplots(1,1, figsize = (4.9, 1))
+sns.set(font_scale = 1, style = 'ticks')
+plt.plot(synch_gain_range, freq[moth_slice,:], c = '#0071BC', linewidth = 3)
+plt.plot(synch_gain_range, freq[asynch_slice,:], c = '#C1272D', linewidth = 3)
+#plt.plot(synch_gain_range, freq[transition_slice,:], c = 'k', linewidth = 2, linestyle = '--')
+
+ax.set_xticks([0, 0.5, 1])
+ax.set_xlabel('$K_r$')
+ax.set_ylabel('$f/f_s$')
+ax.axis([0, 1, 0, np.max(freq)])
+sns.despine()
+plt.savefig('figures/freq_slices.svg', format = 'svg')
+plt.show()
+
+
+
+
+#%%
+"""
+##############################################################################
 Plot freq alone from simulation
 ##############################################################################
 """
@@ -275,8 +323,11 @@ pos = ax.pcolormesh(X,Y, test_freq, cmap = freqcmap, vmin = 0, vmax = 3, edgecol
 cbar = fig.colorbar(pos, ax = ax)#,fraction=0.046, pad=0.04) 
 cbar.ax.set_ylabel(r'$f/f_s$')
 cbar.set_ticks([0, 1, 2, 3, 4])
-#pos.set_clim(0,4)
-#ax.set_ylabel(r'$t_o/T_n$')
+ax.scatter(0.9, yax[moth_slice], c = '#0071BC', s = 20)
+ax.scatter(0.05, yax[asynch_slice], c = '#C1272D', s = 20)
+ax.plot([0, 1], [yax[moth_slice], yax[moth_slice]], c = '#0071BC', linewidth = 2)
+ax.plot([0, 1], [yax[asynch_slice], yax[asynch_slice]], c = '#C1272D', linewidth = 2)
+
 ax.set_yscale('log')
 ax.axis('equal')
 ax.set_xticks([])
@@ -316,27 +367,6 @@ from matplotlib import colors
 import scipy
 
 
-# Manduca t_o/T_n = 0.37
-
-m_val = 0.37
-moth_slice = find_nearest(yax, m_val)
-
-asynch_power = power[:,0] # slice along K_r = 0
-
-asynch_slice = np.where(asynch_power == np.max(asynch_power))[0][0]
-
-fig, ax = plt.subplots(1,1, figsize = (2.4, 1))
-sns.set(font_scale = 1, style = 'ticks')
-plt.plot(synch_gain_range, power[moth_slice,:], c = '#0071BC', linewidth = 2)
-plt.plot(synch_gain_range, power[asynch_slice,:], c = '#C1272D', linewidth = 2)
-
-ax.set_xticks([0, 0.5, 1])
-ax.set_xlabel('$K_r$')
-ax.set_ylabel('power (au)')
-ax.axis([0, 1, 0, np.max(power)])
-sns.despine()
-plt.savefig('figures/power_slices.svg', format = 'svg')
-plt.show()
 
 
 power_cmap = colors.LinearSegmentedColormap.from_list('freqcmap', ['white', '#6018D1'])
@@ -359,9 +389,11 @@ cs = ax.contour(X, Y, freq_smoothed, levels = [0.99, 1.01], colors = '#808080', 
 #cs = ax.contour(X, Y, power_smoothed, levels = [15], colors = 'r', linewidths = 1.5, linestyles = '-', alpha = 1)
 #cs = ax.contour(X, Y, power_smoothed, levels = [np.max(power_smoothed)*0.1], colors = '#B3B3B3', alpha = 0.4)
 cs = ax.contourf(X, Y, power, levels = [np.min(power), np.max(power)*0.1], colors = '#B3B3B3', alpha = 0.4)
-
+ax.plot([0, 1], [yax[moth_slice], yax[moth_slice]], c = '#0071BC', linewidth = 2)
+ax.plot([0, 1], [yax[asynch_slice], yax[asynch_slice]], c = '#C1272D', linewidth = 2)
 ax.scatter(0.9, yax[moth_slice], c = '#0071BC', s = 20)
 ax.scatter(0.05, yax[asynch_slice], c = '#C1272D', s = 20)
+#plt.plot([0, 1], [yax[transition_slice], yax[transition_slice]], c = 'k', linewidth = 2, linestyle = '--')
 #ax.clabel(cs, inline = 1, fontsize = 6)
 ax.set_yscale('log')
 cbar = fig.colorbar(pos, ax = ax)#,fraction=0.046, pad=0.04) 
@@ -485,6 +517,8 @@ https://stackoverflow.com/questions/17316880/reading-v-7-3-mat-file-in-python
 import hdf5storage
 mat = hdf5storage.loadmat('test.mat')
 """
+
+"""
 import h5py
 arrays = {}
 
@@ -492,7 +526,10 @@ f = h5py.File('data/limit_cycle/lc_array.mat')
 
 for k, v in f.items():
     arrays[k] = np.array(v)
+"""
+import mat73
 
+#lc_array = mat73.loadmat('data/limit_cycle/lc_array_single.mat')
 
 slice_idx = 5;
 lc_array = lc_array[::2,::2, :, :]
@@ -657,7 +694,7 @@ yax = t_o/T_n
 X, Y = np.meshgrid(synch_gain_range, yax)
 fig,ax = plt.subplots(1,1,figsize = (5.3,5))
 sns.set(font_scale = 1, style = 'ticks')
-pos = ax.pcolor(X, Y, power_df, cmap = 'Reds', edgecolors = 'none')
+pos = ax.pcolor(X, Y, power, cmap = 'Reds', edgecolors = 'none')
 
 plt.xlabel(r'$K_r$')
 plt.ylabel(r'$t_o/T_n$')
@@ -698,6 +735,10 @@ r3_range = np.array(r3_range)
 t_o = np.log(1/r4_ratio)/((1-r4_ratio) * r3_range)
 
 yax = t_o/T_n
+yax = np.squeeze(yax)
+
+yax = np.logspace(-1.7, 0, 20)
+#yax = r3_range
 
 
 from matplotlib import colors
@@ -798,10 +839,149 @@ plt.savefig('figures/flapper_freq.png', format = 'png', dpi = 500)
 
 plt.show()
 
-#%% Test
+#%% 
 
-data = np.zeros((10,10))
+"""
+==========
+Plot power alone for roboflapper
+=========
+"""
 
-data[0,:] = np.linspace(0, 1, 10)
+# Extract t_o/T_n for peak asynch power
 
-plt.pcolor(data)
+asynch_power = power[:,0]
+asynch_index = np.where(asynch_power == np.max(asynch_power))[0][0] - 1# Add one to align with 10x 10 grid.
+#asynch_slice = find_nearest(yax,)
+arnold_index = 11
+
+from scipy.io import loadmat
+synch_gain_range = loadmat('data/20201122_flapper/synch_gain_range.mat')['synch_gain_range'][0].flatten()
+power = loadmat('data/20201122_flapper/power.mat')['conv_array']
+freq = loadmat('data/20201122_flapper/freq.mat')['freq_array']
+osc_amp = loadmat('data/20201122_flapper/osc_amp.mat')['est_amp_array']
+r3_range = loadmat('data/20201122_flapper/r3_range.mat')['r3_range']
+
+power_cmap = colors.LinearSegmentedColormap.from_list('freqcmap', ['white', '#6018D1'])
+#freqcmap.set_bad('#8FB0ED')
+
+
+
+X, Y = np.meshgrid(synch_gain_range, yax)
+fig, ax = plt.subplots(1, 1, figsize = (3,2.3))
+sns.set(font_scale = 1, style = 'ticks')
+
+pos = ax.pcolor(X, Y, power, cmap = power_cmap, edgecolors = 'face', linewidth = .1)
+
+freq_smoothed = scipy.ndimage.filters.gaussian_filter(freq_total, sigma = .1)
+power_smoothed = scipy.ndimage.filters.gaussian_filter(power, sigma = 0.8)
+
+
+cs = ax.contour(X, Y, freq_smoothed, levels = [.99, 1.01], colors = '#808080', linewidths = 1.5, linestyles = '-', alpha = 1)
+#cs = ax.contourf(X, Y, power, levels = [np.min(power), np.max(power[:,0])*0.1], colors = '#B3B3B3', alpha = 0.4)
+
+
+ax.plot([0, 1], [yax[arnold_index], yax[arnold_index]], c = 'k', linewidth = 2, solid_capstyle = 'butt', alpha = 1, linestyle = '--')
+ax.scatter(synch_gain_range[18], yax[arnold_index], c = '#0071BC', s = 20, zorder = 10)
+ax.scatter(synch_gain_range[2], yax[arnold_index], c = 'k', s = 20, zorder = 10)
+ax.scatter(synch_gain_range[0], yax[arnold_index], c = '#C1272D', s = 20, zorder = 10)
+
+ax.plot([0, 1], [yax[asynch_index], yax[asynch_index]], c = 'k', linewidth = 2, solid_capstyle = 'butt', alpha = 1)
+ax.scatter(synch_gain_range[18], yax[asynch_index], c = '#0071BC', s = 20, zorder = 10)
+ax.scatter(synch_gain_range[2], yax[asynch_index], c = 'k', s = 20, zorder = 10)
+ax.scatter(synch_gain_range[0], yax[asynch_index], c = '#C1272D', s = 20, zorder = 10)
+
+"""
+ax.plot([0, 1], [yax[moth_slice], yax[moth_slice]], c = '#0071BC', linewidth = 2)
+ax.plot([0, 1], [yax[asynch_slice], yax[asynch_slice]], c = '#C1272D', linewidth = 2)
+ax.scatter(0.9, yax[moth_slice], c = '#0071BC', s = 20)
+ax.scatter(0.05, yax[asynch_slice], c = '#C1272D', s = 20)
+"""
+ax.set_yscale('log')
+cbar = fig.colorbar(pos, ax = ax)#,fraction=0.046, pad=0.04) 
+cbar.ax.set_ylabel('power (au)')
+ax.set_ylabel(r'$t_o/T_n$')
+ax.axis('equal')
+#fig, ax = plt.subplots(1, 1, figsize = (3,3))
+sns.set(font_scale = 1, style = 'ticks')
+#pos.set_clim(0,4)
+ax.set_ylabel(r'$t_o/T_n$')
+ax.set_xlabel(r'$K_r$')
+ax.set_xticks([0, 0.5, 1])
+ax.axis('equal')
+ax.set_xlim([0, 1])
+#plt.plot([0, 1], [m_val, m_val], c = '#0071BC', linewidth = 3, solid_capstyle = 'butt')
+#plt.plot([0, 1], [yax[asynch_slice], yax[asynch_slice]], c = '#C1272D', linewidth = 3, solid_capstyle = 'butt')
+#ax[0].scatter(1, 0.55)
+sns.despine()
+#plt.tight_layout()
+plt.savefig('figures/flapper_power.svg', format = 'svg', transparent = True)
+plt.savefig('figures/flapper_power.png', format = 'png', dpi = 500)
+plt.show()
+
+#%%
+"""
+================
+Plot select limit time traces from flapper
+===============
+"""
+
+f_s = 1000
+t = np.linspace(0, len(a_trace))
+
+flapper_data = loadmat('data/20201122_flapper/roboflapperParamSweep_20x20_02to1.mat')
+raw_data = flapper_data['raw_data'] # raw_data[20x10][1]
+k = 0
+
+start_idx = 36000
+
+
+a_trace = np.squeeze(raw_data[arnold_index+k, 0][0][0][1][0][0][0])[start_idx:]
+mid_trace = np.squeeze(raw_data[arnold_index+k, 2][0][0][1][0][0][0])[start_idx:]
+s_trace = np.squeeze(raw_data[arnold_index+k, 18][0][0][1][0][0][0])[start_idx:]
+
+
+f_s = 1000
+t = np.linspace(0, len(a_trace)/f_s, len(a_trace))
+
+fig, ax = plt.subplots(2,3, figsize = (7, 1.5))
+sns.set(font_scale = 1, style = 'ticks')
+ax[0, 0].plot(t, a_trace, c = '#C1272D', linestyle = ':', dashes=(5, 1))
+ax[0, 0].set_xticks([])
+ax[0,0].set_yticks([-0.5, 0, 0.5])
+ax[0, 1].plot(t, mid_trace, c = 'k', linestyle = '-')
+ax[0, 1].set_yticks([])
+ax[0, 1].set_xticks([])
+ax[0, 2].plot(t, s_trace, c = '#0071BC', linestyle = '-')
+ax[0, 2].set_yticks([])
+ax[0, 2].set_xticks([])
+
+
+
+a_trace = np.squeeze(raw_data[asynch_index+k, 0][0][0][1][0][0][0])[start_idx:]
+mid_trace = np.squeeze(raw_data[asynch_index+k, 2][0][0][1][0][0][0])[start_idx:]
+s_trace = np.squeeze(raw_data[asynch_index+k, 18][0][0][1][0][0][0])[start_idx:]
+
+
+ax[1, 0].plot(t, a_trace, c = '#C1272D')
+ax[1, 0].set_xlabel('time (s)')
+ax[1,0].set_yticks([-0.5, 0, 0.5])
+ax[1, 1].plot(t, mid_trace, c = 'k')
+ax[1, 1].set_yticks([])
+ax[1, 1].set_xlabel('time (s)')
+ax[1, 2].plot(t, s_trace, c = '#0071BC')
+ax[1, 2].set_yticks([])
+ax[1, 2].set_xlabel('time (s)')
+plt.ylabel('pos (au)')
+sns.despine()
+plt.savefig('figures/roboflapper_traces.svg', format = 'svg')
+plt.show()
+
+
+
+"""
+for i in range(20):
+    pos =  np.squeeze(raw_data[asynch_index, i][0][0][1][0][0][0])
+    plt.plot(pos[32000:])
+    plt.title(i)    
+    plt.show()
+"""
