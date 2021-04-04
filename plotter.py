@@ -806,7 +806,7 @@ plt.show()
 
 
 
-freqcmap = colors.LinearSegmentedColormap.from_list('freqcmap', ['white', '#FF272D'])
+freqcmap = colors.LinearSegmentedColormap.from_list('freqcmap', ['black', 'white', 'red','#FF272D', 'blue'])
 freqcmap.set_bad('#8FB0ED')
 
 X, Y = np.meshgrid(synch_gain_range, yax)
@@ -867,7 +867,7 @@ power_cmap = colors.LinearSegmentedColormap.from_list('freqcmap', ['white', '#60
 
 
 X, Y = np.meshgrid(synch_gain_range, yax)
-fig, ax = plt.subplots(1, 1, figsize = (3,2.3))
+fig, ax = plt.subplots(1, 1, figsize = (6,4.8))
 sns.set(font_scale = 1, style = 'ticks')
 
 pos = ax.pcolor(X, Y, power, cmap = power_cmap, edgecolors = 'face', linewidth = .1)
@@ -875,6 +875,8 @@ pos = ax.pcolor(X, Y, power, cmap = power_cmap, edgecolors = 'face', linewidth =
 freq_smoothed = scipy.ndimage.filters.gaussian_filter(freq_total, sigma = .1)
 power_smoothed = scipy.ndimage.filters.gaussian_filter(power, sigma = 0.8)
 
+
+cs = ax.contourf(X, Y, power, levels = [np.min(power), np.max(power)*0.1], colors = '#B3B3B3', alpha = 0.4)
 
 cs = ax.contour(X, Y, freq_smoothed, levels = [.99, 1.01], colors = '#808080', linewidths = 1.5, linestyles = '-', alpha = 1)
 #cs = ax.contourf(X, Y, power, levels = [np.min(power), np.max(power[:,0])*0.1], colors = '#B3B3B3', alpha = 0.4)
@@ -926,7 +928,6 @@ Plot select limit time traces from flapper
 """
 
 f_s = 1000
-t = np.linspace(0, len(a_trace))
 
 flapper_data = loadmat('data/20201122_flapper/roboflapperParamSweep_20x20_02to1.mat')
 raw_data = flapper_data['raw_data'] # raw_data[20x10][1]
@@ -943,11 +944,12 @@ s_trace = np.squeeze(raw_data[arnold_index+k, 18][0][0][1][0][0][0])[start_idx:]
 f_s = 1000
 t = np.linspace(0, len(a_trace)/f_s, len(a_trace))
 
-fig, ax = plt.subplots(2,3, figsize = (7, 1.5))
+fig, ax = plt.subplots(2,3, figsize = (7, 3))
 sns.set(font_scale = 1, style = 'ticks')
-ax[0, 0].plot(t, a_trace, c = '#C1272D', linestyle = ':', dashes=(5, 1))
+ax[0, 0].plot(t, a_trace, c = '#C1272D', linestyle = '-')#, dashes=(5, 1))
 ax[0, 0].set_xticks([])
 ax[0,0].set_yticks([-0.5, 0, 0.5])
+#ax[0,0].set_ylabel('position (rad)')
 ax[0, 1].plot(t, mid_trace, c = 'k', linestyle = '-')
 ax[0, 1].set_yticks([])
 ax[0, 1].set_xticks([])
@@ -964,6 +966,8 @@ s_trace = np.squeeze(raw_data[asynch_index+k, 18][0][0][1][0][0][0])[start_idx:]
 
 ax[1, 0].plot(t, a_trace, c = '#C1272D')
 ax[1, 0].set_xlabel('time (s)')
+ax[1,0].set_ylabel('position (rad)')
+
 ax[1,0].set_yticks([-0.5, 0, 0.5])
 ax[1, 1].plot(t, mid_trace, c = 'k')
 ax[1, 1].set_yticks([])
@@ -973,7 +977,7 @@ ax[1, 2].set_yticks([])
 ax[1, 2].set_xlabel('time (s)')
 plt.ylabel('pos (au)')
 sns.despine()
-plt.savefig('figures/roboflapper_traces.svg', format = 'svg')
+plt.savefig('figures/defense_roboflapper_traces.svg', format = 'svg')
 plt.show()
 
 

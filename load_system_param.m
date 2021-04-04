@@ -9,6 +9,9 @@ if strcmp(system, 'moth')
     T = 1860; % [rad/m]
     C_viscous = 0;
     
+    Inertia = 5.69E-8;
+    T = 2230;
+    
     unit_converter = 1000; % convert kg to g
     Inertia = Inertia * unit_converter;
     K = K * unit_converter;
@@ -20,6 +23,8 @@ if strcmp(system, 'moth')
     
     % Synchronous forcing
     gain_constant = 1790/T;
+    
+    gain_constant = 2340/T;
     asynch_gain = 1/75000;
     synch_freq = 25;
     
