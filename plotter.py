@@ -2,7 +2,7 @@
 """
 Created on Fri Oct 16 09:41:51 2020
 
-@author: Administrator
+@author: Jeff Gau
 """
 
 import seaborn as sns
@@ -600,7 +600,7 @@ plt.show()
 plot roboflapper limit cycles
 ##############################################################################
 """
-
+# TO DO: r3_range should be extracted automatically from James's separate flapper code.
 flapper_data = loadmat('data/20201122_flapper/roboflapperParamSweep_20x20_02to1.mat')
 raw_data = flapper_data['raw_data'] # raw_data[20x10][1]
 
@@ -609,7 +609,6 @@ synch_gain_range = np.linspace(0, 1, nSynch)
 r3_range = [306.564856593887, 249.487438045280, 203.036911777704, 165.234722305919, 134.470689178953, 109.434421506060, 89.0595019887825, 72.4780629835994, 58.9838197671064, 48.0019864094016, 39.0647928253259, 31.7915601548261, 25.8724857852742, 21.0554473404036, 17.1352635531001, 13.9449545900065, 11.3486295623484, 9.23569826722170, 7.51616060904457, 6.11677305455622]
 r3_range = np.logspace(-1.7, 0, 20)
 
-print('to do: update r3_range')
 t = raw_data[0,0][0][0][0]
 
 r3_range = r3_range[::]
@@ -683,6 +682,22 @@ plt.savefig('figures/flapper_limit_cycle.png', format = 'png', dpi = 500)
 
 plt.show()
 
+
+#%%
+"""
+##############################################################################
+plot roboflapper heat maps
+##############################################################################
+"""
+
+from scipy.io import loadmat
+synch_gain_range = loadmat('data/20201122_flapper/synch_gain_range.mat')['synch_gain_range'][0].flatten()
+power = loadmat('data/20201122_flapper/power.mat')['conv_array']
+freq = loadmat('data/20201122_flapper/freq.mat')['freq_array']
+osc_amp = loadmat('data/20201122_flapper/osc_amp.mat')['est_amp_array']
+r3_range = loadmat('data/20201122_flapper/r3_range.mat')['r3_range']
+
+
 T_n = 1/f_n
 r4_ratio = 0.62
 
@@ -708,20 +723,6 @@ sns.despine(offset = 5)
 plt.tight_layout()
 plt.savefig('figures/flapper_axes.svg', format = 'svg', transparent = True)
 plt.show()
-
-#%%
-"""
-##############################################################################
-plot roboflapper heat maps
-##############################################################################
-"""
-
-from scipy.io import loadmat
-synch_gain_range = loadmat('data/20201122_flapper/synch_gain_range.mat')['synch_gain_range'][0].flatten()
-power = loadmat('data/20201122_flapper/power.mat')['conv_array']
-freq = loadmat('data/20201122_flapper/freq.mat')['freq_array']
-osc_amp = loadmat('data/20201122_flapper/osc_amp.mat')['est_amp_array']
-r3_range = loadmat('data/20201122_flapper/r3_range.mat')['r3_range']
 
 #power_df = pd.DataFrame(data = power, columns = synch_gain_range, index = yax)
 #power_df = power_df.rename_axis('yax')

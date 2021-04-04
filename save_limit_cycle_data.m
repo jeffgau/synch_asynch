@@ -17,7 +17,10 @@ save('data/limit_cycle/r3', 'r3')
 save('data/limit_cycle/synch_gain_range', 'synch_gain_range')
 save('data/limit_cycle/freqs', 'freqs')
 
-save('data/limit_cycle/lc_array', 'lc_array', '-v7.3')
+%save('data/limit_cycle/lc_array', 'lc_array', '-v7.3') #v7.3 may be
+%required for very large files, but has some compatibility issues with Python that need
+%to be explored. 
+save('data/limit_cycle/lc_array', 'lc_array')
 
 end
 

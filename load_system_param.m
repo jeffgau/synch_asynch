@@ -3,10 +3,10 @@ function param = load_system_param(system)
 %   Detailed explanation goes here
 
 if strcmp(system, 'moth')
-    Inertia = 6.81E-8; % [kg m2]
+    %Inertia = 6.81E-8; % [kg m2]
     K = 3760; % [N/m]
     Gamma = 3.69E-8; % [kg]
-    T = 1860; % [rad/m]
+    %T = 1860; % [rad/m]
     C_viscous = 0;
     
     Inertia = 5.69E-8;
@@ -22,7 +22,7 @@ if strcmp(system, 'moth')
     K = K/T^2;
     
     % Synchronous forcing
-    gain_constant = 1790/T;
+    %gain_constant = 1790/T;
     
     gain_constant = 2340/T;
     asynch_gain = 1/75000;

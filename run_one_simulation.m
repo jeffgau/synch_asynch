@@ -1,4 +1,4 @@
-function peak_force = run_one_simulation(sys_param, sim_param, K_r)
+function peak_opt_param = run_one_simulation(sys_param, sim_param, K_r)
 % Run simulation for specific K_r and r3 for synch-asynch gain tuning
 
 % Unpack system parameters
@@ -25,7 +25,7 @@ t_end = sim_param('t_end');
 r4_ratio = sim_param('r4_ratio');
 
 
-max_force = [];
+opt_param = [];
 
 for i = 1:length(r3_range)
     
@@ -80,8 +80,8 @@ for i = 1:length(r3_range)
     osc_amp = peaks(peak_idx);
     
     half_idx = length(position)/2;
-    max_force = [max_force, osc_amp]; %THIS IS THE OPTIMIZED PARAMETR! position, osc amp, power. Not peak force
+    opt_param = [opt_param, osc_amp]; %THIS IS THE OPTIMIZED PARAMETR! position, osc amp, power. Not peak force
 end
-peak_force = max(max_force);
+peak_opt_param = max(opt_param);
 end
 
