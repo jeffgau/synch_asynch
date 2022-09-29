@@ -1,4 +1,6 @@
-function datastruct = run_simulation(sys_param, sim_param)
+function datastruct = single_r3_sweep(sys_param, sim_param)
+% Note: expects that sim_param('r3_range') is a scalar value
+
 
 % Unpack system parameters
 Inertia = sys_param('I');
@@ -26,33 +28,29 @@ r4_ratio = sim_param('r4_ratio');
 
 datastruct = struct;
 
-datastruct.freq_array      = zeros(ntests,ntests);
-datastruct.conv_array      = zeros(ntests,ntests);
-datastruct.est_amp_array   = zeros(ntests,ntests);
-datastruct.force_array     = zeros(ntests,ntests);
-datastruct.psd_array       = zeros(ntests, ntests);
-datastruct.lc_array        = struct("position",cell(ntests,ntests),"velocity",cell(ntests,ntests));
+datastruct.freq_array      = zeros(length(r3_range),ntests);
+datastruct.conv_array      = zeros(length(r3_range),ntests);
+datastruct.est_amp_array   = zeros(length(r3_range),ntests);
+datastruct.force_array     = zeros(length(r3_range),ntests);
+datastruct.psd_array       = zeros(length(r3_range),ntests);
+datastruct.lc_array        = struct("position",cell(length(r3_range),ntests),"velocity",cell(length(r3_range),ntests));
 
 
 sim_count = 1;
 
 
 % Set variables for plotting spectrogram and limit cycles
-spectrogram_r3 = sim_param('r3_spect');
-spect_peaks = [];
+% spectrogram_r3 = sim_param('r3_spect');
+spect_peaks = cell(length(r3_range),1);
 n_freqs = 2000; % Number of fourier modes to plot
-limit_pos = [];
-limit_vel = [];
-limit_t = [];
+limit_pos = cell(length(r3_range),1);
+limit_vel = cell(length(r3_range),1);
+limit_t = cell(length(r3_range),1);
 
 fft_freqrange = [];
 
-D = parallel.pool.DataQueue;
-h = waitbar(0, "Simulation in progress");
-afterEach(D, @nUpdateWaitbar)
 
-
-for p = 1:ntests
+for p = 1:length(r3_range)
     % p sweeps over r3
     for k = 1:ntests
         % k sweeps over K_r
@@ -116,13 +114,13 @@ for p = 1:ntests
         fft_freqrange = freq;
         
         % Store values for spectrogram
-        if r3_range(p) == spectrogram_r3
-            spect_peaks = [spect_peaks, peaks(1:n_freqs)];
-            limit_pos = [limit_pos, position];
-            limit_vel = [limit_vel, velocity];
-            figure(1)
+%         if r3_range(p) == spectrogram_r3
+        spect_peaks{p} = [spect_peaks{p}, peaks(1:n_freqs)];
+        limit_pos{p} = [limit_pos{p}, position];
+        limit_vel{p} = [limit_vel{p}, velocity];
+%         figure(1)
             %plot(position, velocity)
-        end
+%         end
         datastruct.lc_array(p,k).position = position;
         datastruct.lc_array(p,k).velocity = velocity;
         
@@ -145,22 +143,25 @@ for p = 1:ntests
         sim_count = sim_count + 1;
         
     end
-    send(D, p);
+    
 end
 
 
-
-
-
-spect_keys = {'synch_gain_range', 'freq', 'spect_peaks'};
-spect_vals = {synch_gain_range, fft_freqrange, spect_peaks};
-datastruct.spect_data = containers.Map(spect_keys, spect_vals);
 
 k3 = 1;  
 k4 = 1;
 t_o = log( (k3*r3_range)/(k4*r3_range*r4_ratio) )./(r3_range-r3_range*r4_ratio); 
 % disp('Double check t_o calc')
 yax = f_n.*t_o;
+
+try
+    spect_keys = {'synch_gain_range', 'freq', 'spect_peaks'};
+    spect_vals = {synch_gain_range, fft_freqrange, spect_peaks};
+    datastruct.spect_data = containers.Map(spect_keys, spect_vals);
+catch
+    disp("couldn't save spectrum data")
+end
+
 
 try
     force_keys = {'synch_gain_range', 'yax', 'force_array'};
@@ -179,10 +180,10 @@ catch
 end
 
 try
-    lc_keys = {'limit_pos', 'limit_vel', 'limit_t', 'spectrogram_r3', 'synch_gain_range', 'freq_array', 'lc_array'};
-    lc_vals = {limit_pos, limit_vel, t, spectrogram_r3, synch_gain_range, datastruct.freq_array, datastruct.lc_array};
+    lc_keys = {'limit_pos', 'limit_vel', 'limit_t', 'synch_gain_range', 'freq_array', 'lc_array'};
+    lc_vals = {limit_pos, limit_vel, t, synch_gain_range, datastruct.freq_array, datastruct.lc_array};
     datastruct.lc_data = containers.Map(lc_keys, lc_vals);
-catch
+catch ME
     disp("couldn't save lc_data")
 end
 

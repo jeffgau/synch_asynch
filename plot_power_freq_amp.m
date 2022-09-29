@@ -1,20 +1,26 @@
-function plot_power_freq_amp(conv_array,freq_array, est_amp_array, psd_array, synch_gain_range, r3_range, f_n, r4_ratio)
+function plot_power_freq_amp(datastruct, sim_param, sys_param)
 
-psd_array
+synch_gain_range = sim_param('synch_gain_range');
+r3_range         = sim_param('r3_range');
+r4_ratio         = sim_param('r4_ratio');
+f_n              = sys_param('f_n');
+
+
+% datastruct.psd_array
 figure('Renderer', 'painters', 'Position', [10 10 900 600])
 k3 = 1; 
 k4 = 1;
 
 t_o = log( (k3*r3_range)/(k4*r3_range*r4_ratio) )./(r3_range-r3_range*r4_ratio); % Time to peak
 
-yax = f_n.*t_o;
+yax = f_n.*t_o
 
 
 figure(1)
 colormap(cool)
 
 subplot(1,3,2)
-surf(synch_gain_range,yax(1:end),conv_array(:,:),'edgecolor', 'none')
+surf(synch_gain_range,yax(1:end),datastruct.conv_array(:,:),'edgecolor', 'none')
 axis square
 axis([min(synch_gain_range) max(synch_gain_range) min(yax) max(yax)])
 view(0,90)
@@ -28,7 +34,7 @@ set(gca,'YScale','log')
 
 
 subplot(1,3,1)
-surf(synch_gain_range(1:end),yax(1:end),freq_array(1:end,1:end), 'edgecolor', 'none')
+surf(synch_gain_range(1:end),yax(1:end),datastruct.freq_array(1:end,1:end), 'edgecolor', 'none')
 axis square
 axis([min(synch_gain_range) max(synch_gain_range) min(yax) max(yax)])
 view(0,90)
@@ -57,7 +63,7 @@ set(gca,'YScale','log')
 
 
 subplot(1,3,3)
-surf(synch_gain_range,yax(1:end),psd_array(:,:),'edgecolor', 'none')
+surf(synch_gain_range,yax(1:end),datastruct.psd_array(:,:),'edgecolor', 'none')
 axis square
 axis([min(synch_gain_range) max(synch_gain_range) min(yax) max(yax)])
 view(0,90)

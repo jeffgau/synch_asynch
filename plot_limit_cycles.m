@@ -12,7 +12,7 @@ lc_array = lc_data('lc_array');
 pos = squeeze(lc_array(idx, :, 1, :));
 vel = squeeze(lc_array(idx, :, 2, :));
 
-[n_cycles, temp] = size(pos);
+[n_cycles, ~] = size(pos);
 
 count = 1;
 figure

@@ -7,6 +7,7 @@ synch_param = containers.Map(sim_param.keys, sim_param.values);
 temp = sim_param('r3_range');
 synch_param('r3_range') = temp(1);
 
+
 asynch_mag = run_one_simulation(sys_param, sim_param, 0);
 synch_mag = run_one_simulation(sys_param, synch_param, 1);
 

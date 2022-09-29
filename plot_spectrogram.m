@@ -7,7 +7,7 @@ spect_peaks = spect_data('spect_peaks');
 n_freqs = 400;
 
 
-surf(synch_gain_range,freq(1:n_freqs),spect_peaks(1:n_freqs,:))
+surf(synch_gain_range,freq(1:n_freqs),spect_peaks{1}(1:n_freqs,:))
 ax = gca;
 ax.XAxis.FontSize = 14;
 ax.YAxis.FontSize = 14;

@@ -27,7 +27,7 @@ r4_ratio = sim_param('r4_ratio');
 
 opt_param = [];
 
-for i = 1:length(r3_range)
+parfor i = 1:length(r3_range)
     
     % Sweep through parameters to generate forcing functions
     synch_gain = K_r * gain_constant;
@@ -66,7 +66,7 @@ for i = 1:length(r3_range)
     
     upstroke_synch      = dat(:,9);
     downstroke_synch    = dat(:,10);
-    plot(position)
+%     plot(position)
     power = calculate_power(velocity, net_force, position, t);
 
     %spring_force        = dat(:,11);
