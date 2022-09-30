@@ -47,17 +47,15 @@ limit_t = [];
 
 fft_freqrange = [];
 
-D = parallel.pool.DataQueue;
-h = waitbar(0, "Simulation in progress");
-afterEach(D, @nUpdateWaitbar)
+close all;
 
+h = waitbar(0,"Simulation in Progress");
 
 for p = 1:ntests
     % p sweeps over r3
     for k = 1:ntests
         % k sweeps over K_r
         
-%         p, k
         clc
         fprintf("p: %3d, k: %3d\n", p,k )
 
@@ -143,9 +141,11 @@ for p = 1:ntests
         datastruct.force_array(p,k) = max(net_force);
         
         sim_count = sim_count + 1;
+
+        waitbar(sim_count/ntests^2,h)
         
     end
-    send(D, p);
+    
 end
 
 

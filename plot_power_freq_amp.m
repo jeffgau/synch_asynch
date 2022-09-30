@@ -21,6 +21,7 @@ colormap(cool)
 
 subplot(1,3,2)
 surf(synch_gain_range,yax(1:end),datastruct.conv_array(:,:),'edgecolor', 'none')
+% pcolor(synch_gain_range,yax(1:end),datastruct.conv_array(:,:))
 axis square
 axis([min(synch_gain_range) max(synch_gain_range) min(yax) max(yax)])
 view(0,90)
@@ -31,7 +32,7 @@ a.Label.String = 'power (au)';
 a.Label.FontSize = 14;
 %set(gca,'ColorScale','log')
 set(gca,'YScale','log')
-
+set(gca, "Layer","top")
 
 subplot(1,3,1)
 surf(synch_gain_range(1:end),yax(1:end),datastruct.freq_array(1:end,1:end), 'edgecolor', 'none')
@@ -44,6 +45,7 @@ a = colorbar;
 a.Label.String = 'f/f_s_y_n_c_h';
 a.Label.FontSize = 14;
 set(gca,'YScale','log')
+set(gca, "Layer","top")
 %{
 subplot(1,3,3)
 surf(synch_gain_range,yax,est_amp_array(:,:), 'edgecolor', 'none')
@@ -74,6 +76,7 @@ a.Label.String = 'energy ratio';
 a.Label.FontSize = 14;
 %set(gca,'ColorScale','log')
 set(gca,'YScale','log')
+set(gca, "Layer","top")
 
 
 
