@@ -2,7 +2,7 @@ function param = load_simulation_param(system, f_n)
 % Load moth, robobee, or roboflapper system parameters
 %   Detailed explanation goes here
 
-r4_ratio = 0.62;
+r4_ratio = 0.078;        % UPDATE 10/5/2022
 if strcmp(system, 'moth')
     ntests  = 100; % Typically 100 for paper figures
     synch_gain_range = linspace(0, 1, ntests);
