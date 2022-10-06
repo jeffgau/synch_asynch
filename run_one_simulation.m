@@ -80,8 +80,15 @@ parfor i = 1:length(r3_range)
     osc_amp = peaks(peak_idx);
     
     half_idx = length(position)/2;
-    opt_param = [opt_param, osc_amp]; %THIS IS THE OPTIMIZED PARAMETR! position, osc amp, power. Not peak force
+    opt_param = [opt_param, power]; %THIS IS THE OPTIMIZED PARAMETR! position, osc amp, power. Not peak force
 end
-peak_opt_param = max(opt_param);
+[peak_opt_param, pk_opt_idx] = max(opt_param);
+figure(1)
+hold on
+semilogx(r3_range,opt_param)
+semilogx(r3_range(pk_opt_idx),peak_opt_param,'rx')
+
+
+
 end
 

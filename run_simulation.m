@@ -121,11 +121,11 @@ for p = 1:ntests
             figure(1)
             %plot(position, velocity)
         end
-        datastruct.lc_array(p,k).position = position;
-        datastruct.lc_array(p,k).velocity = velocity;
+        datastruct.lc_array(p,k).position = position(end-9999:end); %last 1 second of oscillations
+        datastruct.lc_array(p,k).velocity = velocity(end-9999:end);
         
         % Calculate empirical power requirements
-        datastruct.conv_array(p,k) = calculate_power(velocity, net_force, position, t);
+        datastruct.conv_array(p,k) = calculate_power(velocity(end-9999:end), net_force(end-9999:end), position(end-9999:end), t(end-9999:end));
         
         % Calculate power ratio in dominant frequency
         
@@ -149,18 +149,13 @@ for p = 1:ntests
 end
 
 
-
-
-
 spect_keys = {'synch_gain_range', 'freq', 'spect_peaks'};
 spect_vals = {synch_gain_range, fft_freqrange, spect_peaks};
 datastruct.spect_data = containers.Map(spect_keys, spect_vals);
 
-k3 = 1;  
-k4 = 1;
-t_o = log( (k3*r3_range)/(k4*r3_range*r4_ratio) )./(r3_range-r3_range*r4_ratio); 
-% disp('Double check t_o calc')
-yax = f_n.*t_o;
+
+[t_o, yax] = convertr3t0(sim_param('r3_range'),sim_param('r4_ratio'),sys_param('f_n'));
+
 
 try
     force_keys = {'synch_gain_range', 'yax', 'force_array'};

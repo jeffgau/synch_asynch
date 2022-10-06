@@ -25,7 +25,7 @@ if strcmp(system, 'moth')
     %gain_constant = 1790/T;
     
     gain_constant = 2340/T;
-    asynch_gain = 1/75000;
+    asynch_gain = 1/200000;
     synch_freq = 25;
     
 elseif strcmp(system,'robobee')

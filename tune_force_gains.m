@@ -1,7 +1,7 @@
 function [sys_param,sim_param] = tune_force_gains(sys_param,sim_param)
 %UNTITLED3 Summary of this function goes here
 %   Detailed explanation goes here
-
+clf
 [sys_param,sim_param, asynch_peak, synch_peak] = set_force_gains(sys_param,sim_param);
 
 err = (asynch_peak - synch_peak)/asynch_peak;
