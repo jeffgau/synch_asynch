@@ -74,14 +74,33 @@ parfor i = 1:length(r3_range)
     %visc_force          = dat(:,13);
     
     % Extract properties of dominant oscillation frequency
-    [freq, peaks] = fourier_analysis(position - mean(position), sampling_f);
+    % Trim to just the last half of the data and 
+    half_idx = floor(length(position)/2);
+     
+    % 
+    [freq, peaks] = fourier_analysis(position(half_idx:end) - mean(position(half_idx:end)), sampling_f);
     peak_idx = find(peaks == max(peaks));
     osc_freq = freq(peak_idx)/synch_freq;
-    osc_amp = peaks(peak_idx);
+    osc_amp = peaks(peak_idx);  % this does a bad job at measuring the actual flapping amplitude
+     
+    % 
+    [pks,inds] = findpeaks(position,"MinPeakDistance",1/(2*osc_freq*synch_freq)*sampling_f); % This does a lot better
+    if length(pks)<10
+        osc_amp = 0
+    else
+        osc_amp = mean(pks(floor(end/2):end))
+    end
+
+%     clf
+%     plot(position)
+%     hold on
+%     plot(inds,pks)
+
     
-    half_idx = length(position)/2;
-    opt_param = [opt_param, power]; %THIS IS THE OPTIMIZED PARAMETR! position, osc amp, power. Not peak force
+
+    opt_param = [opt_param, osc_amp]; %THIS IS THE OPTIMIZED PARAMETR! position, osc amp, power. Not peak force
 end
+
 [peak_opt_param, pk_opt_idx] = max(opt_param);
 figure(1)
 hold on

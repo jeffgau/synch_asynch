@@ -22,7 +22,7 @@ sampfreq    = sim_param('sampling_f');
 [t_0,yax]   = convertr3t0(r3_range,sim_param('r4_ratio'),sys_param('f_n'));
 
 % preallocate spectral matrix. 
-spectra     = zeros(ntests,ntests,5001);
+spectra     = zeros(ntests,ntests,10001);
 
 %% compute spectra
 % r: loops over r3
@@ -66,20 +66,24 @@ end
 
 
 %% 
-numfreqs = 100;
+close all
+numfreqs = 200;
 
 figure(1)
+% figure(2)
 colormap('bone')
 colorbar
 
-v = VideoWriter("additional_analysis\spectral_analysis_oct5_2",'MPEG-4');
+
+v = VideoWriter("additional_analysis\spectral_analysis_oct6",'MPEG-4');
 v.FrameRate = 10;
 
 open(v)
 
 for i = 1:100
     specmat = squeeze(spectra(i,:,1:numfreqs));
-
+    
+    f1 = figure(1);
     clf
     subplot(1,2,1)
     surf(freq(1:numfreqs),linspace(0,1,100),specmat,'EdgeAlpha',0)
@@ -89,8 +93,9 @@ for i = 1:100
     ylabel("K_r")
     xlabel("Frequency (Hz)")
     title(sprintf("Frequency Spectrum, t_0/T_n = %1.3f",yax(i)))
-%     drawnow
-    
+%     drawnow    
+
+
     subplot(1,2,2)
     surf(linspace(0,1,100),yax(1:end),datastruct.conv_array(:,:),'edgecolor', 'none','HandleVisibility','off')
     % pcolor(synch_gain_range,yax(1:end),datastruct.conv_array(:,:))
@@ -109,11 +114,14 @@ for i = 1:100
     plot3([0 1], [yax(i) yax(i)], [100, 100],'r-','LineWidth',2)
     legend("current slice")
     
-    
+%     f2 = figure(2);
+%     hold on
+%     plot(linspace(0,1,100),max(specmat'))
+
 
     drawnow
-    writeVideo(v,getframe(gcf));
-    pause(0.01)
+    writeVideo(v,getframe(f1));
+%     pause(0.01)
 end
 
 close(v)
@@ -136,6 +144,9 @@ a.Label.FontSize = 14;
 %set(gca,'ColorScale','log')
 set(gca,'YScale','log')
 set(gca, "Layer","top")
+
+%%
+
 
 
 

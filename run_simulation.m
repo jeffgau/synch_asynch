@@ -121,11 +121,11 @@ for p = 1:ntests
             figure(1)
             %plot(position, velocity)
         end
-        datastruct.lc_array(p,k).position = position(end-9999:end); %last 1 second of oscillations
-        datastruct.lc_array(p,k).velocity = velocity(end-9999:end);
+        datastruct.lc_array(p,k).position = position(end-49999:end); %last 1 second of oscillations
+        datastruct.lc_array(p,k).velocity = velocity(end-49999:end);
         
         % Calculate empirical power requirements
-        datastruct.conv_array(p,k) = calculate_power(velocity(end-9999:end), net_force(end-9999:end), position(end-9999:end), t(end-9999:end));
+        datastruct.conv_array(p,k) = calculate_power(velocity(end-49999:end), net_force(end-49999:end), position(end-49999:end), t(end-49999:end));
         
         % Calculate power ratio in dominant frequency
         

@@ -25,7 +25,7 @@ synch_peak = max(synch_mag);
 % You might also need to change the inital value of asynch_gain in
 % load_system_parameters.m
 
-conv_rate = 10;
+conv_rate = 2;
 err = (synch_peak - asynch_peak)/synch_peak;
 sys_param('asynch_gain') = sys_param('asynch_gain') * (1+err/conv_rate);
 
