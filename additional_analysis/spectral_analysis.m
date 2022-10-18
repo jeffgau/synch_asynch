@@ -66,38 +66,52 @@ end
 
 
 %% 
-close all
+% close all
 numfreqs = 200;
 
 figure(1)
+clf
 % figure(2)
-colormap('bone')
+colormap(powerpurple)
 colorbar
 
+Kr = linspace(0,1,100);
 
-v = VideoWriter("additional_analysis\spectral_analysis_oct6",'MPEG-4');
-v.FrameRate = 10;
+savevid = 1;
 
-open(v)
+if savevid
+    v = VideoWriter("additional_analysis\spectral_analysis_oct18",'MPEG-4');
+    v.FrameRate = 10;
+    open(v)
+end
 
 for i = 1:100
+
     specmat = squeeze(spectra(i,:,1:numfreqs));
     
+    % Kr at the synch-asynch boundary
+    transitidx = find(abs(datastruct.freq_array(i,:)-1)<0.001,2);
+    Krtrans = Kr(transitidx(2));
+
     f1 = figure(1);
+    f1.Color = 'white';
     clf
     subplot(1,2,1)
-    surf(freq(1:numfreqs),linspace(0,1,100),specmat,'EdgeAlpha',0)
+    surf(freq(1:numfreqs),Kr,specmat,'EdgeAlpha',0)
+    grid off
+    set(gca,'Layer','top')
+    hold on
+    yline(Krtrans,'Color',[.4 .4 .4])
     view(90,-90)
-    colormap('bone')
+%     colormap('bone')
     axis square
     ylabel("K_r")
     xlabel("Frequency (Hz)")
     title(sprintf("Frequency Spectrum, t_0/T_n = %1.3f",yax(i)))
 %     drawnow    
 
-
     subplot(1,2,2)
-    surf(linspace(0,1,100),yax(1:end),datastruct.conv_array(:,:),'edgecolor', 'none','HandleVisibility','off')
+    surf(Kr,yax(1:end),datastruct.conv_array(:,:),'edgecolor', 'none','HandleVisibility','off')
     % pcolor(synch_gain_range,yax(1:end),datastruct.conv_array(:,:))
     axis square
     axis([0 1 min(yax) max(yax)])
@@ -111,8 +125,9 @@ for i = 1:100
     set(gca,'YScale','log')
     set(gca, "Layer","top")
     hold on
+    fcon = contour3(Kr,yax(1:end),datastruct.freq_array(:,:)+80,80+[0.99 1],'Color',[.4 .4 .4]);
     plot3([0 1], [yax(i) yax(i)], [100, 100],'r-','LineWidth',2)
-    legend("current slice")
+    legend(["Asynch Boundary","current slice"])
     
 %     f2 = figure(2);
 %     hold on
@@ -120,12 +135,15 @@ for i = 1:100
 
 
     drawnow
-    writeVideo(v,getframe(f1));
+    if savevid
+        writeVideo(v,getframe(f1));
+    end
 %     pause(0.01)
 end
 
-close(v)
-
+if savevid
+    close(v)
+end
 %%
 
 % figure()
