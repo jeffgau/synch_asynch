@@ -77,7 +77,7 @@ colorbar
 
 Kr = linspace(0,1,100);
 
-savevid = 1;
+savevid = 0;
 
 if savevid
     v = VideoWriter("additional_analysis\spectral_analysis_oct18",'MPEG-4');
@@ -85,7 +85,7 @@ if savevid
     open(v)
 end
 
-for i = 1:100
+for i = 95
 
     specmat = squeeze(spectra(i,:,1:numfreqs));
     
