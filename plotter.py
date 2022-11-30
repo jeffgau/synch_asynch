@@ -183,9 +183,9 @@ synch_gain_range = loadmat('data/synch_gain_range.mat')['synch_gain_range'][0].f
 yax = loadmat('data/yax.mat')['yax'][0].flatten()
 power = loadmat('data/power.mat')['power']
 freq = loadmat('data/freq.mat')['freq']
-osc_amp = loadmat('data/osc_amp.mat')['osc_amp']
-psd = loadmat('data/psd.mat')['psd']
-r3_range = loadmat('data/r3_range.mat')['r3_range']
+# osc_amp = loadmat('data/osc_amp.mat')['osc_amp']
+# psd = loadmat('data/psd.mat')['psd']
+# r3_range = loadmat('data/r3_range.mat')['r3_range']
 
 power_df = pd.DataFrame(data = power, columns = synch_gain_range, index = yax)
 power_df = power_df.rename_axis('yax')
@@ -323,10 +323,10 @@ pos = ax.pcolormesh(X,Y, test_freq, cmap = freqcmap, vmin = 0, vmax = 3, edgecol
 cbar = fig.colorbar(pos, ax = ax)#,fraction=0.046, pad=0.04) 
 cbar.ax.set_ylabel(r'$f/f_s$')
 cbar.set_ticks([0, 1, 2, 3, 4])
-ax.scatter(0.9, yax[moth_slice], c = '#0071BC', s = 20)
-ax.scatter(0.05, yax[asynch_slice], c = '#C1272D', s = 20)
-ax.plot([0, 1], [yax[moth_slice], yax[moth_slice]], c = '#0071BC', linewidth = 2)
-ax.plot([0, 1], [yax[asynch_slice], yax[asynch_slice]], c = '#C1272D', linewidth = 2)
+# ax.scatter(0.9, yax[moth_slice], c = '#0071BC', s = 20)
+# ax.scatter(0.05, yax[asynch_slice], c = '#C1272D', s = 20)
+# ax.plot([0, 1], [yax[moth_slice], yax[moth_slice]], c = '#0071BC', linewidth = 2)
+# ax.plot([0, 1], [yax[asynch_slice], yax[asynch_slice]], c = '#C1272D', linewidth = 2)
 
 ax.set_yscale('log')
 ax.axis('equal')
@@ -336,8 +336,8 @@ ax.set_yticks([])
 sns.despine()
 plt.axis('off')
 #plt.tight_layout()
-plt.savefig('figures/freq.svg', format = 'svg', transparent = True)
-plt.savefig('figures/freq.png', format = 'png', dpi = 500)
+# plt.savefig('figures/freq.svg', format = 'svg', transparent = True)
+# plt.savefig('figures/freq.png', format = 'png', dpi = 500)
 
 plt.show()
 
@@ -815,7 +815,7 @@ fig, ax = plt.subplots(1, 1, figsize = (6.23,5))
 sns.set(font_scale = 1, style = 'ticks')
 #pos = ax[0].imshow(power_df[::-1], cmap = 'Reds', extent = [np.min(synch_gain_range), np.max(synch_gain_range),0.01, 1])
 
-test_freq_total = np.ma.masked_values(freq_total, 1, atol = 1E-2, copy = True)
+test_freq_total = np.ma.masked_values(freq, 1, atol = 1E-2, copy = True)
 
 sns.set(font_scale = 1, style = 'ticks')
 pos = ax.pcolormesh(X,Y, test_freq_total, cmap = freqcmap, vmin = 0, vmax = 4, edgecolors = 'face', linewidth = 1)
@@ -835,8 +835,8 @@ plt.axis('off')
 #ax[0].scatter(1, 0.55)
 sns.despine()
 #plt.tight_layout()
-plt.savefig('figures/flapper_freq.svg', format = 'svg', transparent = True)
-plt.savefig('figures/flapper_freq.png', format = 'png', dpi = 500)
+# plt.savefig('figures/flapper_freq.svg', format = 'svg', transparent = True)
+# plt.savefig('figures/flapper_freq.png', format = 'png', dpi = 500)
 
 plt.show()
 
